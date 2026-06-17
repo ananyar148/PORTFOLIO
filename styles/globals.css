@@ -1,0 +1,87 @@
+/* ============================================
+   Global Styles — Portfolio
+   Tailwind v4 uses @import, no config file
+   ============================================ */
+@import "tailwindcss";
+
+/* ---------- CSS custom properties ---------- */
+:root {
+  /* Light theme */
+  --bg-primary:    #ffffff;
+  --bg-secondary:  #f8fafc;
+  --bg-card:       #f1f5f9;
+  --text-primary:  #0f172a;
+  --text-secondary:#475569;
+  --accent:        #6366f1;       /* indigo-500  */
+  --accent-light:  #a5b4fc;       /* indigo-300  */
+  --border:        #e2e8f0;
+  --shadow:        0 4px 24px rgba(0,0,0,.08);
+}
+
+/* Dark theme — applied when <html class="dark"> */
+.dark {
+  --bg-primary:    #0a0a0f;
+  --bg-secondary:  #111118;
+  --bg-card:       #1a1a2e;
+  --text-primary:  #f1f5f9;
+  --text-secondary:#94a3b8;
+  --accent:        #818cf8;       /* indigo-400  */
+  --accent-light:  #6366f1;       /* indigo-500  */
+  --border:        #1e1e2e;
+  --shadow:        0 4px 24px rgba(0,0,0,.4);
+}
+
+/* ---------- Base ---------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar        { width: 6px; }
+::-webkit-scrollbar-track  { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb  { background: var(--accent); border-radius: 3px; }
+
+/* ---------- Selection ---------- */
+::selection { background: var(--accent); color: #fff; }
+
+/* ---------- Utility helpers ---------- */
+.section-padding { padding: 5rem 0; }
+.container-custom {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* ---------- Gradient text helper ---------- */
+.gradient-text {
+  background: linear-gradient(135deg, var(--accent) 0%, #ec4899 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ---------- Glowing card hover ---------- */
+.card-glow {
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card-glow:hover {
+  box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
+  transform: translateY(-4px);
+}
