@@ -1,41 +1,50 @@
 /**
  * app/api/contact/route.js
  *
- * POST  /api/contact
+ * POST /api/contact
  *
- * Accepts a JSON body, validates + sanitizes inputs, sends two emails
- * via Nodemailer (owner notification + visitor confirmation), and
- * returns a JSON response with an appropriate HTTP status code.
+ * Flow:
+ *   1. Parse + validate + sanitize the request body
+ *   2. Ensure the contacts table exists (idempotent)
+ *   3. INSERT the submission into PostgreSQL (parameterized — no SQL injection)
+ *   4. Only if the INSERT succeeds → send both emails in parallel
+ *   5. Return a structured JSON response
  *
- * Security measures:
- *   • Server-side validation (never trust the client)
- *   • Input sanitization (strip HTML tags, trim whitespace)
- *   • Only POST is accepted; all other methods return 405
- *   • SMTP credentials live in env vars — never reach the client
- *   • Errors are logged server-side but only generic messages reach the client
- *   • No sensitive data is written to the response body
+ * If the DB insert fails, emails are NOT sent and a 500 is returned.
+ * SMTP failures after a successful insert return 500 but the record is
+ * already safely stored — the visitor can be contacted manually.
+ *
+ * Security:
+ *   • Server-side validation + sanitization
+ *   • Parameterized queries only
+ *   • Credentials never reach the client
+ *   • Generic error messages in responses; details logged server-side only
  */
 
-import { NextResponse }          from 'next/server';
-import { sendMail }              from '@/lib/mailer';
+import { NextResponse }        from 'next/server';
+import { query, initSchema }   from '@/lib/db';
+import { sendMail }            from '@/lib/mailer';
 import { ownerNotification,
-         visitorConfirmation }   from '@/lib/emailTemplates';
+         visitorConfirmation } from '@/lib/emailTemplates';
 
-/* ── Constants ─────────────────────────────────────────────────── */
-const EMAIL_REGEX    = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const MAX_NAME_LEN   = 100;
+/* ── Constants ──────────────────────────────────────────────────── */
+const EMAIL_REGEX     = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const MAX_NAME_LEN    = 100;
 const MAX_SUBJECT_LEN = 200;
-const MAX_MSG_LEN    = 5000;
+const MAX_MSG_LEN     = 5000;
 
-/* ── Sanitize: strip HTML tags and trim whitespace ──────────────── */
+/* Track whether we've already run initSchema in this process */
+let schemaReady = false;
+
+/* ── Sanitize helper ────────────────────────────────────────────── */
 function sanitize(str) {
   return String(str)
-    .replace(/<[^>]*>/g, '')   // remove any HTML tags
-    .replace(/[\u0000-\u001F\u007F]/g, '') // strip control chars
+    .replace(/<[^>]*>/g, '')              // strip HTML tags
+    .replace(/[\u0000-\u001F\u007F]/g, '') // strip control characters
     .trim();
 }
 
-/* ── Field-level validation ─────────────────────────────────────── */
+/* ── Validation ─────────────────────────────────────────────────── */
 function validateBody({ name, email, subject, message }) {
   const errors = [];
 
@@ -60,9 +69,10 @@ function validateBody({ name, email, subject, message }) {
   return errors;
 }
 
-/* ── Route handler ──────────────────────────────────────────────── */
+/* ── POST handler ───────────────────────────────────────────────── */
 export async function POST(request) {
-  /* 1. Parse JSON body */
+
+  /* ── Step 1: Parse body ───────────────────────────────────────── */
   let body;
   try {
     body = await request.json();
@@ -73,7 +83,7 @@ export async function POST(request) {
     );
   }
 
-  /* 2. Validate */
+  /* ── Step 2: Validate ─────────────────────────────────────────── */
   const validationErrors = validateBody(body);
   if (validationErrors.length > 0) {
     return NextResponse.json(
@@ -82,7 +92,7 @@ export async function POST(request) {
     );
   }
 
-  /* 3. Sanitize */
+  /* ── Step 3: Sanitize ─────────────────────────────────────────── */
   const data = {
     name:    sanitize(body.name),
     email:   sanitize(body.email).toLowerCase(),
@@ -90,22 +100,75 @@ export async function POST(request) {
     message: sanitize(body.message),
   };
 
-  /* 4. Check required env vars */
-  const { FROM_EMAIL, OWNER_EMAIL } = process.env;
-  if (!FROM_EMAIL || !OWNER_EMAIL) {
-    console.error('[contact/route] Missing FROM_EMAIL or OWNER_EMAIL env vars.');
+  /* ── Step 4: Ensure DB schema exists (once per process) ────────── */
+  try {
+    if (!schemaReady) {
+      await initSchema();
+      schemaReady = true;
+    }
+  } catch (err) {
+    console.error('[contact/route] DB schema init failed:', err.message);
     return NextResponse.json(
-      { success: false, message: 'Server configuration error. Please try again later.' },
+      { success: false, message: 'Database unavailable. Please try again later.' },
+      { status: 503 }
+    );
+  }
+
+  /* ── Step 5: Insert into PostgreSQL ─────────────────────────────
+     Parameterized query — values are passed separately, never
+     interpolated into the SQL string, so SQL injection is impossible.
+  ─────────────────────────────────────────────────────────────────── */
+  let insertedRow;
+  try {
+    const sql = `
+      INSERT INTO contacts (full_name, email, subject, message)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, created_at
+    `;
+    const result = await query(sql, [
+      data.name,
+      data.email,
+      data.subject || null,  // store NULL for empty subject
+      data.message,
+    ]);
+
+    insertedRow = result.rows[0];
+    console.log(
+      `[contact/route] Saved submission id=${insertedRow.id} ` +
+      `from ${data.email} at ${insertedRow.created_at}`
+    );
+  } catch (err) {
+    console.error('[contact/route] DB insert failed:', err.message);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Failed to save your submission. Please try again later.',
+      },
       { status: 500 }
     );
   }
 
-  /* 5. Send both emails */
+  /* ── Step 6: Send emails (only after successful DB insert) ──────── */
+  const { FROM_EMAIL, OWNER_EMAIL } = process.env;
+
+  if (!FROM_EMAIL || !OWNER_EMAIL) {
+    /* DB record is already saved — warn but don't block the response */
+    console.error('[contact/route] Missing FROM_EMAIL or OWNER_EMAIL — emails not sent.');
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Your message was received, but email notification failed. I\'ll check the database.',
+        id: insertedRow.id,
+      },
+      { status: 200 }
+    );
+  }
+
   try {
     const ownerTpl   = ownerNotification(data);
     const visitorTpl = visitorConfirmation(data);
 
-    /* Run in parallel — if one fails, Promise.all rejects and we catch below */
+    /* Both emails sent in parallel for speed */
     await Promise.all([
       sendMail({
         from:    `"Portfolio Contact" <${FROM_EMAIL}>`,
@@ -124,32 +187,44 @@ export async function POST(request) {
       }),
     ]);
 
-    return NextResponse.json(
-      { success: true, message: 'Message sent successfully!' },
-      { status: 200 }
-    );
+    console.log(`[contact/route] Emails sent for submission id=${insertedRow.id}`);
   } catch (err) {
-    /* Log the real error server-side only */
-    console.error('[contact/route] Failed to send email:', err?.message ?? err);
-
+    /*
+     * DB insert already succeeded — the message is NOT lost.
+     * Log the SMTP failure but return partial success to the frontend
+     * so the user isn't confused.
+     */
+    console.error('[contact/route] SMTP failed (record saved):', err.message);
     return NextResponse.json(
       {
-        success: false,
+        success: true,
         message:
-          'Failed to send your message. Please try again later or email me directly.',
+          'Your message was saved! Email delivery had a hiccup — ' +
+          'I\'ll still see your submission and get back to you.',
+        id: insertedRow.id,
       },
-      { status: 500 }
+      { status: 200 }
     );
   }
+
+  /* ── Step 7: Full success ───────────────────────────────────────── */
+  return NextResponse.json(
+    {
+      success: true,
+      message: 'Message sent successfully! Check your inbox for a confirmation email.',
+      id: insertedRow.id,
+    },
+    { status: 200 }
+  );
 }
 
-/* Reject every other HTTP method cleanly */
-export function GET()    { return methodNotAllowed(); }
-export function PUT()    { return methodNotAllowed(); }
-export function PATCH()  { return methodNotAllowed(); }
-export function DELETE() { return methodNotAllowed(); }
+/* ── Reject all other HTTP methods ──────────────────────────────── */
+export function GET()    { return _methodNotAllowed(); }
+export function PUT()    { return _methodNotAllowed(); }
+export function PATCH()  { return _methodNotAllowed(); }
+export function DELETE() { return _methodNotAllowed(); }
 
-function methodNotAllowed() {
+function _methodNotAllowed() {
   return NextResponse.json(
     { success: false, message: 'Method not allowed.' },
     { status: 405, headers: { Allow: 'POST' } }
