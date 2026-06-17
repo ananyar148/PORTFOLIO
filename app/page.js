@@ -1,23 +1,20 @@
 /**
- * app/page.js — Home page
- *
- * Assembles all portfolio sections in order.
- * All heavy interactivity lives inside each section's own
- * Client Component; this file remains a Server Component.
+ * app/page.js  →  route: /
+ * Landing (Hero) page only.
  */
 
-import Hero     from '@/components/Hero';
-import About    from '@/components/About';
-import Projects from '@/components/Projects';
-import Contact  from '@/components/Contact';
+import Hero           from '@/components/Hero';
+import PageTransition from '@/components/PageTransition';
+
+export const metadata = {
+  title:       'Ananya Raj | Full Stack Developer',
+  description: 'Welcome to Ananya Raj\'s portfolio — Full Stack Developer specialising in React, Next.js and Node.js.',
+};
 
 export default function HomePage() {
   return (
-    <>
-      <Hero     />
-      <About    />
-      <Projects />
-      <Contact  />
-    </>
+    <PageTransition>
+      <Hero />
+    </PageTransition>
   );
 }

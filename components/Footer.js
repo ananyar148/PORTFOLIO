@@ -2,22 +2,23 @@
 
 /**
  * Footer.js
- * Site footer with logo, nav links, social icons, and copyright.
+ * Site footer — nav links use next/link for multi-page routing.
  */
 
+import Link   from 'next/link';
 import { motion } from 'framer-motion';
 
 const NAV_LINKS = [
-  { label: 'Home',     href: '#home'     },
-  { label: 'About',    href: '#about'    },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Contact',  href: '#contact'  },
+  { label: 'Home',     href: '/'         },
+  { label: 'About',    href: '/about'    },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Contact',  href: '/contact'  },
 ];
 
 const SOCIALS = [
   {
     name: 'GitHub',
-    href: 'https://github.com',
+    href: 'https://github.com/ananyar148',
     svg: (
       <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
         <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483
@@ -59,10 +60,6 @@ const SOCIALS = [
   },
 ];
 
-const scrollTo = (href) => {
-  document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-};
-
 export default function Footer() {
   return (
     <footer
@@ -71,40 +68,38 @@ export default function Footer() {
     >
       <div className="container-custom py-12">
 
-        {/* Top row */}
+        {/* ── Top row ─────────────────────────────────────────── */}
         <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-10">
 
           {/* Logo */}
-          <motion.a
-            href="#home"
-            onClick={(e) => { e.preventDefault(); scrollTo('#home'); }}
-            whileHover={{ scale: 1.05 }}
-            className="text-2xl font-extrabold gradient-text select-none"
-            aria-label="Back to top"
-          >
-            &lt;Ananya /&gt;
-          </motion.a>
+          <Link href="/" aria-label="Home">
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              className="text-2xl font-extrabold gradient-text select-none cursor-pointer"
+            >
+              &lt;Ananya Raj /&gt;
+            </motion.span>
+          </Link>
 
           {/* Nav links */}
           <nav aria-label="Footer navigation">
             <ul className="flex flex-wrap justify-center gap-6" role="list">
               {NAV_LINKS.map(({ label, href }) => (
                 <li key={href}>
-                  <a
+                  <Link
                     href={href}
-                    onClick={(e) => { e.preventDefault(); scrollTo(href); }}
                     className="text-sm font-medium transition-colors duration-200 hover:underline"
                     style={{ color: 'var(--text-secondary)' }}
                   >
                     {label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
           </nav>
 
           {/* Social icons */}
-          <div className="flex items-center gap-3" role="list" aria-label="Social media links">
+          <div className="flex items-center gap-3" aria-label="Social media links">
             {SOCIALS.map(({ name, href, svg }) => (
               <motion.a
                 key={name}
@@ -114,13 +109,12 @@ export default function Footer() {
                 aria-label={name}
                 whileHover={{ scale: 1.2, y: -2 }}
                 whileTap={{ scale: 0.9 }}
-                role="listitem"
                 className="w-9 h-9 rounded-lg flex items-center justify-center border
                            transition-colors duration-200"
                 style={{
                   borderColor: 'var(--border)',
-                  background: 'var(--bg-card)',
-                  color: 'var(--text-secondary)',
+                  background:  'var(--bg-card)',
+                  color:       'var(--text-secondary)',
                 }}
               >
                 {svg}
@@ -132,11 +126,17 @@ export default function Footer() {
         {/* Divider */}
         <div className="h-px mb-6" style={{ background: 'var(--border)' }} aria-hidden="true" />
 
-        {/* Bottom row */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm"
-             style={{ color: 'var(--text-secondary)' }}>
+        {/* ── Bottom row ──────────────────────────────────────── */}
+        <div
+          className="flex flex-col sm:flex-row items-center justify-between gap-3 text-sm"
+          style={{ color: 'var(--text-secondary)' }}
+        >
           <p>
-            &copy; {new Date().getFullYear()} <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>Ananya Raj</span>. All rights reserved.
+            &copy; {new Date().getFullYear()}{' '}
+            <span className="font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Ananya Raj
+            </span>
+            . All rights reserved.
           </p>
           <p>
             Built with{' '}
@@ -156,6 +156,7 @@ export default function Footer() {
             </a>
           </p>
         </div>
+
       </div>
     </footer>
   );

@@ -1,22 +1,16 @@
 'use client';
 
 /**
- * Hero.js
- * Full-viewport landing section.
- *
- * Changes applied:
- *  - Profile image loaded from /images/ananya.png
- *  - "Available for opportunities" badge is fully pill-shaped (rounded-full)
- *  - Both CTA buttons are fully rounded (rounded-full) with cleaner styling
- *  - Social icons row has explicit top margin (mt-8) separating it from the buttons
- *  - Layout properly centred vertically and horizontally
- *  - Scroll indicator pinned to bottom of section
+ * Hero.js  —  route: /
+ * Full-viewport landing page. "Get In Touch" now navigates to /contact
+ * via next/link instead of anchor-scroll.
  */
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
-/* ── Social links ─────────────────────────────────────────────────── */
+/* ── Social links ──────────────────────────────────────────────── */
 const SOCIALS = [
   {
     name: 'GitHub',
@@ -62,29 +56,24 @@ const SOCIALS = [
   },
 ];
 
-/* ── Framer Motion variants ─────────────────────────────────────── */
+/* ── Animation variants ─────────────────────────────────────────── */
 const containerVariants = {
-  hidden: {},
+  hidden:  {},
   visible: { transition: { staggerChildren: 0.13 } },
 };
-
 const itemVariants = {
   hidden:  { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: 'easeOut' } },
 };
 
-/* ════════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════ */
 export default function Hero() {
-  const scrollTo = (id) =>
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-
   return (
     <section
-      id="home"
       className="relative min-h-screen flex flex-col overflow-hidden"
       style={{ background: 'var(--bg-primary)' }}
     >
-      {/* ── Background orbs ─────────────────────────────────────────── */}
+      {/* ── Background orbs ─────────────────────────────────────── */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
         <motion.div
           animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
@@ -106,34 +95,33 @@ export default function Hero() {
         />
       </div>
 
-      {/* ── Main centred content ─────────────────────────────────────── */}
+      {/* ── Main centred content ─────────────────────────────────── */}
       <div className="flex-1 flex items-center relative z-10">
         <div className="container-custom w-full py-28 lg:py-16">
           <div className="flex flex-col-reverse lg:flex-row items-center justify-between gap-14 lg:gap-20">
 
-            {/* ── LEFT — text column ─────────────────────────────────── */}
+            {/* ── LEFT — text ──────────────────────────────────── */}
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               className="flex-1 flex flex-col items-center text-center lg:items-start lg:text-left"
             >
-
-              {/* ① "Available for opportunities" — fully pill-shaped */}
+              {/* Available badge */}
               <motion.div variants={itemVariants} className="mb-6">
                 <span
-                  className="inline-flex items-center gap-2.5 px-5 py-2 text-sm font-semibold
-                             border-2 rounded-full select-none"
+                  className="inline-flex items-center gap-2.5 px-5 py-2 text-sm
+                             font-semibold border-2 rounded-full select-none"
                   style={{
                     borderColor: 'var(--accent)',
-                    color: 'var(--accent)',
-                    background: 'rgba(99,102,241,0.08)',
+                    color:       'var(--accent)',
+                    background:  'rgba(99,102,241,0.08)',
                   }}
                 >
-                  {/* Pulsing green dot */}
                   <span className="relative flex h-2.5 w-2.5 shrink-0">
                     <span
-                      className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"
+                      className="animate-ping absolute inline-flex h-full w-full
+                                 rounded-full opacity-75"
                       style={{ background: '#4ade80' }}
                     />
                     <span
@@ -145,17 +133,18 @@ export default function Hero() {
                 </span>
               </motion.div>
 
-              {/* ② Name heading */}
+              {/* Name */}
               <motion.h1
                 variants={itemVariants}
-                className="text-5xl sm:text-6xl xl:text-7xl font-extrabold leading-[1.1] mb-4 tracking-tight"
+                className="text-5xl sm:text-6xl xl:text-7xl font-extrabold
+                           leading-[1.1] mb-4 tracking-tight"
                 style={{ color: 'var(--text-primary)' }}
               >
                 Hi, I&rsquo;m{' '}
                 <span className="gradient-text">Ananya Raj</span>
               </motion.h1>
 
-              {/* ③ Role */}
+              {/* Role */}
               <motion.p
                 variants={itemVariants}
                 className="text-xl sm:text-2xl font-semibold mb-5"
@@ -164,7 +153,7 @@ export default function Hero() {
                 Full Stack Developer
               </motion.p>
 
-              {/* ④ Bio */}
+              {/* Bio */}
               <motion.p
                 variants={itemVariants}
                 className="text-base sm:text-lg leading-relaxed mb-8 max-w-[480px]"
@@ -175,12 +164,13 @@ export default function Hero() {
                 great UX, and continuous learning.
               </motion.p>
 
-              {/* ⑤ CTA buttons — both fully rounded (rounded-full) */}
+              {/* CTA buttons */}
               <motion.div
                 variants={itemVariants}
-                className="flex flex-wrap items-center justify-center lg:justify-start gap-4"
+                className="flex flex-wrap items-center justify-center
+                           lg:justify-start gap-4"
               >
-                {/* Primary — Download Resume */}
+                {/* Download Resume */}
                 <motion.a
                   href="/images/resume.pdf"
                   download
@@ -190,11 +180,10 @@ export default function Hero() {
                              rounded-full text-sm font-bold text-white
                              transition-all duration-300"
                   style={{
-                    background: 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
-                    boxShadow: '0 4px 24px rgba(99,102,241,0.40)',
+                    background:  'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                    boxShadow:   '0 4px 24px rgba(99,102,241,0.40)',
                   }}
                 >
-                  {/* Download arrow icon */}
                   <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
                     <path fillRule="evenodd"
                       d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1
@@ -206,36 +195,36 @@ export default function Hero() {
                   Download Resume
                 </motion.a>
 
-                {/* Secondary — Get In Touch */}
-                <motion.button
-                  onClick={() => scrollTo('contact')}
-                  whileHover={{ scale: 1.06, y: -2 }}
-                  whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-2.5 px-7 py-3.5
-                             rounded-full text-sm font-bold border-2
-                             transition-all duration-300"
-                  style={{
-                    borderColor: 'var(--accent)',
-                    color: 'var(--accent)',
-                    background: 'transparent',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = 'rgba(99,102,241,0.10)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                  }}
-                >
-                  {/* Message icon */}
-                  <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
-                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 002.003 1.884z" />
-                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                  </svg>
-                  Get In Touch
-                </motion.button>
+                {/* Get In Touch — now a real Link to /contact */}
+                <Link href="/contact">
+                  <motion.span
+                    whileHover={{ scale: 1.06, y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="inline-flex items-center gap-2.5 px-7 py-3.5
+                               rounded-full text-sm font-bold border-2
+                               transition-all duration-300 cursor-pointer"
+                    style={{
+                      borderColor: 'var(--accent)',
+                      color:       'var(--accent)',
+                      background:  'transparent',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(99,102,241,0.10)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                    }}
+                  >
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 002.003 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    Get In Touch
+                  </motion.span>
+                </Link>
               </motion.div>
 
-              {/* ⑥ Social icons — mt-8 creates clear gap from buttons above */}
+              {/* Social icons */}
               <motion.div
                 variants={itemVariants}
                 className="flex items-center justify-center lg:justify-start gap-3 mt-8"
@@ -254,16 +243,16 @@ export default function Hero() {
                                border transition-all duration-300"
                     style={{
                       borderColor: 'var(--border)',
-                      background: 'var(--bg-card)',
-                      color: 'var(--text-secondary)',
+                      background:  'var(--bg-card)',
+                      color:       'var(--text-secondary)',
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = 'var(--accent)';
-                      e.currentTarget.style.color = 'var(--accent)';
+                      e.currentTarget.style.color       = 'var(--accent)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)';
-                      e.currentTarget.style.color = 'var(--text-secondary)';
+                      e.currentTarget.style.color       = 'var(--text-secondary)';
                     }}
                   >
                     {svg}
@@ -272,14 +261,13 @@ export default function Hero() {
               </motion.div>
             </motion.div>
 
-            {/* ── RIGHT — profile image ──────────────────────────────── */}
+            {/* ── RIGHT — profile photo ─────────────────────────── */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
               className="flex-shrink-0 flex items-center justify-center"
             >
-              {/* Floating wrapper */}
               <motion.div
                 animate={{ y: [0, -14, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
@@ -293,8 +281,7 @@ export default function Hero() {
                   }}
                   aria-hidden="true"
                 />
-
-                {/* Slow-spinning dashed ring */}
+                {/* Spinning dashed ring */}
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
@@ -302,24 +289,19 @@ export default function Hero() {
                   style={{ borderColor: 'var(--accent)' }}
                   aria-hidden="true"
                 />
-
-                {/* Photo frame */}
+                {/* Photo */}
                 <div
                   className="relative w-64 h-64 sm:w-72 sm:h-72 xl:w-80 xl:h-80
                              rounded-full overflow-hidden border-[3px]"
                   style={{ borderColor: 'var(--accent)' }}
                 >
-                  {/*
-                    Profile photo — loaded from public/images/ananya.png
-                    "fill" fills the container; object-cover crops to circle.
-                  */}
                   <Image
                     src="/images/ananya.png"
                     alt="Ananya Raj — Full Stack Developer"
                     fill
                     className="object-cover object-top"
                     priority
-                    sizes="(max-width: 640px) 256px, (max-width: 1280px) 288px, 320px"
+                    sizes="(max-width:640px) 256px,(max-width:1280px) 288px,320px"
                   />
                 </div>
               </motion.div>
@@ -329,7 +311,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── Scroll indicator — pinned to bottom of section ─────────── */}
+      {/* ── Scroll / explore nudge ───────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -341,7 +323,7 @@ export default function Hero() {
           className="text-xs tracking-widest uppercase"
           style={{ color: 'var(--text-secondary)' }}
         >
-          scroll
+          explore
         </span>
         <motion.div
           animate={{ y: [0, 10, 0] }}

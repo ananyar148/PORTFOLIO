@@ -141,8 +141,7 @@ export default function Projects() {
 
   return (
     <section
-      id="projects"
-      className="section-padding"
+      className="section-padding pt-28"
       style={{ background: 'var(--bg-primary)' }}
     >
       <div className="container-custom">

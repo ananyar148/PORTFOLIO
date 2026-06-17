@@ -2,122 +2,107 @@
 
 /**
  * Navbar.js
- * Sticky top navigation with smooth-scroll links, active section highlight,
- * a theme toggle, and a responsive mobile hamburger menu.
+ * Multi-page navigation using next/link + usePathname for active highlighting.
+ * No more anchor-scroll or IntersectionObserver — each link is a real route.
  */
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 
 const NAV_LINKS = [
-  { label: 'Home',     href: '#home'     },
-  { label: 'About',    href: '#about'    },
-  { label: 'Projects', href: '#projects' },
-  { label: 'Contact',  href: '#contact'  },
+  { label: 'Home',     href: '/'         },
+  { label: 'About',    href: '/about'    },
+  { label: 'Projects', href: '/projects' },
+  { label: 'Contact',  href: '/contact'  },
 ];
 
 export default function Navbar() {
-  const [menuOpen, setMenuOpen]     = useState(false);
-  const [scrolled, setScrolled]     = useState(false);
-  const [activeSection, setActive]  = useState('home');
+  const pathname              = usePathname();
+  const [menuOpen, setMenu]   = useState(false);
+  const [scrolled, setScroll] = useState(false);
 
-  /* Shadow navbar once user scrolls */
+  /* Close mobile menu on route change */
+  useEffect(() => { setMenu(false); }, [pathname]);
+
+  /* Shadow on scroll */
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const fn = () => setScroll(window.scrollY > 20);
+    window.addEventListener('scroll', fn, { passive: true });
+    return () => window.removeEventListener('scroll', fn);
   }, []);
 
-  /* Highlight active section via IntersectionObserver */
-  useEffect(() => {
-    const ids = NAV_LINKS.map((l) => l.href.replace('#', ''));
-    const observers = ids.map((id) => {
-      const el = document.getElementById(id);
-      if (!el) return null;
-      const obs = new IntersectionObserver(
-        ([entry]) => { if (entry.isIntersecting) setActive(id); },
-        { threshold: 0.4 }
-      );
-      obs.observe(el);
-      return obs;
-    });
-    return () => observers.forEach((o) => o?.disconnect());
-  }, []);
-
-  const handleNav = (e, href) => {
-    e.preventDefault();
-    setMenuOpen(false);
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-  };
+  const isActive = (href) =>
+    href === '/' ? pathname === '/' : pathname.startsWith(href);
 
   return (
     <motion.nav
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0,   opacity: 1 }}
-      transition={{ duration: 0.6, ease: 'easeOut' }}
+      transition={{ duration: 0.55, ease: 'easeOut' }}
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
-        background: scrolled
-          ? 'rgba(var(--bg-primary-rgb, 255,255,255), 0.85)'
+        backgroundColor: scrolled
+          ? 'color-mix(in srgb, var(--bg-primary) 88%, transparent)'
           : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        boxShadow: scrolled ? 'var(--shadow)' : 'none',
-        backgroundColor: scrolled ? 'color-mix(in srgb, var(--bg-primary) 85%, transparent)' : 'transparent',
+        backdropFilter:  scrolled ? 'blur(14px)' : 'none',
+        boxShadow:       scrolled ? 'var(--shadow)' : 'none',
+        borderBottom:    scrolled ? '1px solid var(--border)' : 'none',
       }}
     >
       <div className="container-custom flex items-center justify-between h-16">
-        {/* Logo */}
-        <motion.a
-          href="#home"
-          onClick={(e) => handleNav(e, '#home')}
-          whileHover={{ scale: 1.05 }}
-          className="text-xl font-bold gradient-text select-none"
-          aria-label="Go to top"
-        >
-          &lt;YourName /&gt;
-        </motion.a>
 
-        {/* Desktop links */}
+        {/* ── Logo ─────────────────────────────────────────────── */}
+        <Link href="/" aria-label="Home">
+          <motion.span
+            whileHover={{ scale: 1.05 }}
+            className="text-xl md:text-2xl font-extrabold tracking-tight
+                       select-none gradient-text cursor-pointer"
+          >
+            &lt;Ananya Raj /&gt;
+          </motion.span>
+        </Link>
+
+        {/* ── Desktop links ────────────────────────────────────── */}
         <ul className="hidden md:flex items-center gap-8" role="list">
           {NAV_LINKS.map(({ label, href }) => {
-            const id = href.replace('#', '');
-            const isActive = activeSection === id;
+            const active = isActive(href);
             return (
               <li key={href}>
-                <a
+                <Link
                   href={href}
-                  onClick={(e) => handleNav(e, href)}
-                  className="relative text-sm font-medium transition-colors duration-200"
-                  style={{
-                    color: isActive ? 'var(--accent)' : 'var(--text-secondary)',
-                  }}
+                  className="relative text-sm font-medium transition-colors duration-200
+                             pb-1 outline-none"
+                  style={{ color: active ? 'var(--accent)' : 'var(--text-secondary)' }}
                 >
                   {label}
-                  {/* Active underline */}
-                  {isActive && (
+                  {/* Animated underline for active route */}
+                  {active && (
                     <motion.span
                       layoutId="nav-underline"
-                      className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
+                      className="absolute -bottom-0.5 left-0 right-0 h-0.5 rounded-full"
                       style={{ background: 'var(--accent)' }}
+                      transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                     />
                   )}
-                </a>
+                </Link>
               </li>
             );
           })}
         </ul>
 
-        {/* Right controls */}
+        {/* ── Right controls ───────────────────────────────────── */}
         <div className="flex items-center gap-3">
           <ThemeToggle />
 
           {/* Hamburger — mobile only */}
           <button
-            className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5
-                       rounded-lg transition-colors duration-200"
+            className="md:hidden w-10 h-10 flex flex-col items-center
+                       justify-center gap-[5px] rounded-lg"
             style={{ background: 'var(--bg-card)' }}
-            onClick={() => setMenuOpen((v) => !v)}
+            onClick={() => setMenu((v) => !v)}
             aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             aria-expanded={menuOpen}
           >
@@ -127,7 +112,7 @@ export default function Navbar() {
               style={{ background: 'var(--text-primary)' }}
             />
             <motion.span
-              animate={{ opacity: menuOpen ? 0 : 1 }}
+              animate={{ opacity: menuOpen ? 0 : 1, scaleX: menuOpen ? 0 : 1 }}
               className="w-5 h-0.5 rounded-full block"
               style={{ background: 'var(--text-primary)' }}
             />
@@ -140,36 +125,53 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* ── Mobile dropdown ──────────────────────────────────────── */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
             key="mobile-menu"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            exit={{   opacity: 0, height: 0 }}
+            transition={{ duration: 0.28 }}
             className="md:hidden overflow-hidden"
-            style={{ background: 'var(--bg-secondary)', borderTop: '1px solid var(--border)' }}
+            style={{
+              background:  'var(--bg-secondary)',
+              borderTop:   '1px solid var(--border)',
+            }}
           >
-            <ul className="container-custom py-4 flex flex-col gap-4" role="list">
-              {NAV_LINKS.map(({ label, href }, i) => (
-                <motion.li
-                  key={href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.07 }}
-                >
-                  <a
-                    href={href}
-                    onClick={(e) => handleNav(e, href)}
-                    className="block text-base font-medium py-1 transition-colors duration-200"
-                    style={{ color: 'var(--text-primary)' }}
+            <ul className="container-custom py-5 flex flex-col gap-1" role="list">
+              {NAV_LINKS.map(({ label, href }, i) => {
+                const active = isActive(href);
+                return (
+                  <motion.li
+                    key={href}
+                    initial={{ opacity: 0, x: -16 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.06 }}
                   >
-                    {label}
-                  </a>
-                </motion.li>
-              ))}
+                    <Link
+                      href={href}
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-xl
+                                 text-sm font-semibold transition-colors duration-200"
+                      style={{
+                        background: active ? 'rgba(99,102,241,0.10)' : 'transparent',
+                        color:      active ? 'var(--accent)' : 'var(--text-primary)',
+                      }}
+                    >
+                      {/* Active dot */}
+                      {active && (
+                        <span
+                          className="w-1.5 h-1.5 rounded-full shrink-0"
+                          style={{ background: 'var(--accent)' }}
+                          aria-hidden="true"
+                        />
+                      )}
+                      {label}
+                    </Link>
+                  </motion.li>
+                );
+              })}
             </ul>
           </motion.div>
         )}

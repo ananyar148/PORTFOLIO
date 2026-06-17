@@ -114,8 +114,7 @@ export default function About() {
 
   return (
     <section
-      id="about"
-      className="section-padding"
+      className="section-padding pt-28"
       style={{ background: 'var(--bg-secondary)' }}
     >
       <div className="container-custom">

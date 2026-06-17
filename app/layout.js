@@ -1,10 +1,9 @@
 /**
  * app/layout.js — Root layout
  *
- * Imports global styles, sets metadata, and wraps every page
- * with the Navbar and Footer. The <html> element starts with
- * class="dark" so the page renders correctly before the client
- * hydrates and syncs with localStorage.
+ * Shared shell for every route: global CSS, Navbar, Footer.
+ * <html class="dark"> gives an immediate dark background before JS
+ * hydrates and syncs with the user's localStorage preference.
  */
 
 import '@/styles/globals.css';
@@ -12,28 +11,22 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
 export const metadata = {
-  title:       'Your Name | Full Stack Developer',
-  description: 'Personal portfolio of a full stack developer specialising in React, Next.js, Node.js and modern web technologies.',
-  keywords:    ['portfolio', 'developer', 'react', 'nextjs', 'full stack'],
-  authors:     [{ name: 'Your Name' }],
-  // Open Graph
+  title:       'Ananya Raj | Full Stack Developer',
+  description: 'Personal portfolio of Ananya Raj — Full Stack Developer specialising in React, Next.js, Node.js and modern web technologies.',
+  keywords:    ['portfolio', 'developer', 'react', 'nextjs', 'full stack', 'Ananya Raj'],
+  authors:     [{ name: 'Ananya Raj' }],
   openGraph: {
-    title:       'Your Name | Full Stack Developer',
-    description: 'Explore my projects, skills, and experience.',
+    title:       'Ananya Raj | Full Stack Developer',
+    description: 'Explore Ananya\'s projects, skills, and experience.',
     type:        'website',
   },
 };
 
 export default function RootLayout({ children }) {
   return (
-    /*
-     * class="dark" gives an immediate dark background before JS runs,
-     * matching the default in useTheme.js.  The hook will correct it
-     * on the client if the user previously chose light mode.
-     */
-    <html lang="en" className="dark">
+    <html lang="en" className="dark" data-scroll-behavior="smooth">
       <body>
-        {/* Skip-to-content link for keyboard / screen-reader users */}
+        {/* Skip-to-content for keyboard / screen-reader users */}
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4
