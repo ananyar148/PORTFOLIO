@@ -61,7 +61,7 @@ body {
 ::selection { background: var(--accent); color: #fff; }
 
 /* ---------- Utility helpers ---------- */
-.section-padding { padding: 5rem 0; }
+.section-padding { padding: 6rem 0; }  /* generous top+bottom on every section */
 .container-custom {
   width: 100%;
   max-width: 1200px;
