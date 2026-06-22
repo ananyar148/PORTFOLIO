@@ -3,11 +3,13 @@
 /**
  * ProjectModal.js
  * Animated modal overlay for detailed project information.
- * Traps focus while open and closes on Escape or backdrop click.
+ * All spacing via inline styles to guarantee rendering (Tailwind v4 scanner bypass).
  */
 
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+
+const EMOJI = { 1: '🛒', 2: '📋', 3: '🤖', 4: '🌐', 5: '⚡', 6: '📊' };
 
 export default function ProjectModal({ project, onClose }) {
   const closeRef = useRef(null);
@@ -25,7 +27,7 @@ export default function ProjectModal({ project, onClose }) {
     return () => window.removeEventListener('keydown', handler);
   }, [project, onClose]);
 
-  /* Prevent background scroll when open */
+  /* Prevent background scroll */
   useEffect(() => {
     document.body.style.overflow = project ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -42,8 +44,13 @@ export default function ProjectModal({ project, onClose }) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.25 }}
-            className="fixed inset-0 z-[100]"
-            style={{ background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(6px)' }}
+            style={{
+              position:       'fixed',
+              inset:          0,
+              zIndex:         100,
+              background:     'rgba(0,0,0,0.72)',
+              backdropFilter: 'blur(6px)',
+            }}
             onClick={onClose}
             aria-hidden="true"
           />
@@ -55,49 +62,100 @@ export default function ProjectModal({ project, onClose }) {
             aria-modal="true"
             aria-labelledby="modal-title"
             initial={{ opacity: 0, scale: 0.85, y: 30 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            animate={{ opacity: 1, scale: 1,    y: 0  }}
+            exit={{   opacity: 0, scale: 0.9,   y: 20 }}
             transition={{ type: 'spring', stiffness: 280, damping: 24 }}
-            className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none"
+            style={{
+              position:       'fixed',
+              inset:          0,
+              zIndex:         101,
+              display:        'flex',
+              alignItems:     'center',
+              justifyContent: 'center',
+              padding:        '1rem',
+              pointerEvents:  'none',
+            }}
           >
             <div
-              className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-3xl
-                         shadow-2xl pointer-events-auto"
-              style={{ background: 'var(--bg-primary)', border: '1px solid var(--border)' }}
+              style={{
+                position:        'relative',
+                width:           '100%',
+                maxWidth:        '40rem',
+                maxHeight:       '90vh',
+                overflowY:       'auto',
+                borderRadius:    '1.5rem',
+                boxShadow:       '0 24px 64px rgba(0,0,0,0.5)',
+                pointerEvents:   'auto',
+                background:      'var(--bg-primary)',
+                border:          '1.5px solid var(--border)',
+              }}
             >
               {/* Close button */}
               <button
                 ref={closeRef}
                 onClick={onClose}
                 aria-label="Close modal"
-                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full flex items-center
-                           justify-center text-lg transition-colors duration-200"
-                style={{ background: 'var(--bg-card)', color: 'var(--text-secondary)' }}
+                style={{
+                  position:       'absolute',
+                  top:            '1rem',
+                  right:          '1rem',
+                  zIndex:         10,
+                  width:          '2.25rem',
+                  height:         '2.25rem',
+                  borderRadius:   '50%',
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'center',
+                  fontSize:       '1rem',
+                  background:     'var(--bg-card)',
+                  color:          'var(--text-secondary)',
+                  border:         '1.5px solid var(--border)',
+                  cursor:         'pointer',
+                  transition:     'background 0.2s',
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.background = 'var(--border)'}
+                onMouseLeave={(e) => e.currentTarget.style.background = 'var(--bg-card)'}
               >
                 ✕
               </button>
 
-              {/* Project image / banner */}
+              {/* Banner */}
               <div
-                className="h-52 flex items-center justify-center text-8xl rounded-t-3xl"
-                style={{ background: 'var(--bg-secondary)' }}
+                style={{
+                  height:         '13rem',
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'center',
+                  fontSize:       '5rem',
+                  borderRadius:   '1.5rem 1.5rem 0 0',
+                  background:     'var(--bg-secondary)',
+                }}
                 aria-hidden="true"
               >
-                {project.id === 1 && '🛒'}
-                {project.id === 2 && '📋'}
-                {project.id === 3 && '🤖'}
-                {project.id === 4 && '🌐'}
-                {project.id === 5 && '⚡'}
-                {project.id === 6 && '📊'}
+                {EMOJI[project.id] ?? '💡'}
               </div>
 
               {/* Content */}
-              <div className="p-8 sm:p-10 space-y-6">
+              <div
+                style={{
+                  padding:       '2rem 2.25rem 2.5rem',
+                  display:       'flex',
+                  flexDirection: 'column',
+                  gap:           '1.5rem',
+                }}
+              >
                 {/* Category + title */}
                 <div>
                   <span
-                    className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4"
-                    style={{ background: 'var(--accent)', color: '#fff' }}
+                    className="text-xs font-semibold"
+                    style={{
+                      display:      'inline-block',
+                      padding:      '0.3rem 0.875rem',
+                      borderRadius: '9999px',
+                      background:   'var(--accent)',
+                      color:        '#fff',
+                      marginBottom: '0.875rem',
+                    }}
                   >
                     {project.category}
                   </span>
@@ -111,24 +169,32 @@ export default function ProjectModal({ project, onClose }) {
                 </div>
 
                 {/* Long description */}
-                <p className="leading-relaxed text-base" style={{ color: 'var(--text-secondary)' }}>
+                <p
+                  className="text-base leading-relaxed"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
                   {project.longDescription}
                 </p>
 
                 {/* Technologies */}
                 <div>
-                  <h3 className="text-sm font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-primary)' }}>
+                  <h3
+                    className="text-sm font-bold uppercase tracking-widest"
+                    style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}
+                  >
                     Technologies Used
                   </h3>
-                  <div className="flex flex-wrap gap-3">
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.625rem' }}>
                     {project.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors"
+                        className="text-sm font-medium"
                         style={{
-                          background: 'rgba(99,102,241,0.1)',
-                          borderColor: 'var(--accent)',
-                          color: 'var(--accent)',
+                          padding:      '0.35rem 0.875rem',
+                          borderRadius: '0.625rem',
+                          border:       '1.5px solid var(--accent)',
+                          background:   'rgba(99,102,241,0.1)',
+                          color:        'var(--accent)',
                         }}
                       >
                         {tech}
@@ -138,18 +204,31 @@ export default function ProjectModal({ project, onClose }) {
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-4">
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                   <motion.a
                     href={project.github}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-1 flex items-center justify-center gap-2
-                               py-3 px-6 rounded-xl text-sm font-semibold border transition-colors"
-                    style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                    className="text-sm font-semibold"
+                    style={{
+                      flex:           1,
+                      minWidth:       '8rem',
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: 'center',
+                      gap:            '0.5rem',
+                      padding:        '0.875rem 1.5rem',
+                      borderRadius:   '0.75rem',
+                      border:         '1.5px solid var(--border)',
+                      color:          'var(--text-primary)',
+                      textDecoration: 'none',
+                      transition:     'background 0.2s',
+                    }}
+                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-card)'}
+                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
-                    {/* GitHub icon */}
                     <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16" aria-hidden="true">
                       <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
                         0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
@@ -168,11 +247,23 @@ export default function ProjectModal({ project, onClose }) {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-1 flex items-center justify-center gap-2
-                               py-3 px-6 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
+                    className="text-sm font-semibold"
                     style={{
-                      background: 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                      flex:           1,
+                      minWidth:       '8rem',
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: 'center',
+                      gap:            '0.5rem',
+                      padding:        '0.875rem 1.5rem',
+                      borderRadius:   '0.75rem',
+                      background:     'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                      color:          '#fff',
+                      textDecoration: 'none',
+                      transition:     'opacity 0.2s',
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.88'}
+                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
                   >
                     🔗 Live Demo
                   </motion.a>

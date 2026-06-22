@@ -35,14 +35,14 @@ const INFO_ITEMS = [
   },
 ];
 
-/* ── Client-side validation (mirrors server rules) ────────────────── */
+/* ── Client-side validation ───────────────────────────────────────── */
 function validate({ name, email, message }) {
   const errors = {};
   if (!name.trim())    errors.name    = 'Name is required.';
   if (!email.trim())   errors.email   = 'Email is required.';
   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
     errors.email = 'Enter a valid email address.';
-  if (!message.trim())          errors.message = 'Message is required.';
+  if (!message.trim())             errors.message = 'Message is required.';
   else if (message.trim().length < 10)
     errors.message = 'Message must be at least 10 characters.';
   return errors;
@@ -55,30 +55,23 @@ export default function Contact() {
   const [fields,  setFields]  = useState(INITIAL);
   const [errors,  setErrors]  = useState({});
   const [loading, setLoading] = useState(false);
-  const [status,  setStatus]  = useState(null); // null | 'success' | 'error'
+  const [status,  setStatus]  = useState(null);
   const [apiMsg,  setApiMsg]  = useState('');
 
   const headerRef  = useRef(null);
   const headerView = useInView(headerRef, { once: true, margin: '-80px' });
 
-  /* Live field update — clears field error on keystroke */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFields((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: '' }));
-    if (status === 'error') setStatus(null); // hide stale error banner
+    if (status === 'error') setStatus(null);
   };
 
-  /* Submit ─────────────────────────────────────────────────────────── */
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    /* Client-side guard */
     const errs = validate(fields);
-    if (Object.keys(errs).length) {
-      setErrors(errs);
-      return;
-    }
+    if (Object.keys(errs).length) { setErrors(errs); return; }
 
     setLoading(true);
     setStatus(null);
@@ -90,31 +83,23 @@ export default function Contact() {
         headers: { 'Content-Type': 'application/json' },
         body:    JSON.stringify(fields),
       });
-
       const data = await res.json();
 
       if (res.ok && data.success) {
         setStatus('success');
         setApiMsg(data.message || 'Message sent!');
-        setFields(INITIAL);   // clear form only on success
+        setFields(INITIAL);
         setErrors({});
       } else {
-        /* Server-side validation errors → map back to fields */
         if (data.errors?.length) {
           const mapped = {};
-          data.errors.forEach(({ field, message }) => {
-            if (field) mapped[field] = message;
-          });
+          data.errors.forEach(({ field, message }) => { if (field) mapped[field] = message; });
           setErrors(mapped);
         }
         setStatus('error');
-        setApiMsg(
-          data.message ||
-          'Something went wrong. Please try again or email me directly.'
-        );
+        setApiMsg(data.message || 'Something went wrong. Please try again or email me directly.');
       }
     } catch {
-      /* Network-level failure */
       setStatus('error');
       setApiMsg('Network error — please check your connection and try again.');
     } finally {
@@ -124,8 +109,8 @@ export default function Contact() {
 
   return (
     <section
-      className="section-padding pt-28"
-      style={{ background: 'var(--bg-secondary)' }}
+      className="section-padding"
+      style={{ background: 'var(--bg-secondary)', paddingTop: '7rem' }}
     >
       <div className="container-custom">
 
@@ -135,32 +120,49 @@ export default function Contact() {
           initial={{ opacity: 0, y: 30 }}
           animate={headerView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-14"
+          style={{ textAlign: 'center', marginBottom: '2rem' }}
         >
           <p
-            className="text-sm font-semibold uppercase tracking-widest mb-3"
-            style={{ color: 'var(--accent)' }}
+            className="text-sm font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--accent)', marginBottom: '0.75rem' }}
           >
             Let&apos;s talk
           </p>
           <h2
-            className="text-4xl sm:text-5xl font-extrabold mb-6 mt-6"
-            style={{ color: 'var(--text-primary)' }}
+            className="text-4xl sm:text-5xl font-extrabold"
+            style={{ color: 'var(--text-primary)', margin: '0.75rem 0 1.5rem' }}
           >
             Get In <span className="gradient-text">Touch</span>
           </h2>
-         <div className="w-full flex justify-center">
-  <p
-    className="max-w-2xl text-center text-base leading-relaxed px-4 sm:px-6 mb-30"
-    style={{ color: "var(--text-secondary)" }}
-  >
-    Have a project in mind or just want to say hi? My inbox is always open.
-    I&apos;ll do my best to get back to you promptly.
-  </p>
-</div>
+          {/* Paragraph — explicit bottom margin creates gap above grid */}
+          <p
+            className="text-base leading-relaxed"
+            style={{
+              color:     'var(--text-secondary)',
+              maxWidth:  '38rem',
+              margin:    '0 auto',
+              padding:   '0 1rem',
+            }}
+          >
+            Have a project in mind or just want to say hi? My inbox is always open.
+            I&apos;ll do my best to get back to you promptly.
+          </p>
         </motion.div>
 
-        <div className="mt-20 sm:mt-24 grid lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 max-w-5xl mx-auto">
+        {/* ── Two-column grid ─────────────────────────────────────── */}
+        {/* marginTop ≈ 56px on mobile → 64px on desktop              */}
+        <div
+          style={{
+            marginTop:           '3.5rem',
+            display:             'grid',
+            gridTemplateColumns: '1fr',
+            gap:                 '2rem',
+            maxWidth:            '64rem',
+            marginLeft:          'auto',
+            marginRight:         'auto',
+          }}
+          className="lg:grid-cols-contact"
+        >
 
           {/* ── Left — contact info ──────────────────────────────── */}
           <motion.aside
@@ -168,12 +170,20 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-           className="lg:col-span-2 mt-8 sm:mt-12 p-6 sm:p-8 rounded-2xl space-y-6 sm:space-y-8"
             aria-label="Contact information"
+            style={{
+              background:   'var(--bg-card)',
+              border:       '1.5px solid var(--border)',
+              borderRadius: '1.25rem',
+              padding:      '2.25rem 2rem',
+              display:      'flex',
+              flexDirection:'column',
+              gap:          '1.25rem',
+            }}
           >
             <h3
-              className="text-xl font-bold mb-6 sm:mb-8"
-              style={{ color: 'var(--text-primary)' }}
+              className="text-xl font-bold"
+              style={{ color: 'var(--text-primary)', marginBottom: '0.5rem' }}
             >
               Contact Info
             </h3>
@@ -183,19 +193,32 @@ export default function Contact() {
                 key={label}
                 whileHover={{ x: 4 }}
                 transition={{ duration: 0.2 }}
-                className="flex items-center gap-5 p-6 rounded-xl border transition-all duration-200"
                 style={{
-                  background:   'var(--bg-card)',
-                  borderColor:  'var(--border)',
+                  display:      'flex',
+                  alignItems:   'center',
+                  gap:          '1.25rem',
+                  padding:      '1.1rem 1.4rem',
+                  borderRadius: '0.875rem',
+                  border:       '1.5px solid var(--border)',
+                  background:   'var(--bg-primary)',
+                  transition:   'all 0.2s',
                 }}
               >
-                <span className="text-2xl w-11 text-center shrink-0" aria-hidden="true">
+                <span
+                  style={{
+                    fontSize:   '1.5rem',
+                    width:      '2.5rem',
+                    textAlign:  'center',
+                    flexShrink: 0,
+                  }}
+                  aria-hidden="true"
+                >
                   {icon}
                 </span>
-                <div className="min-w-0 flex-1">
+                <div style={{ minWidth: 0, flex: 1 }}>
                   <p
-                    className="text-xs font-semibold uppercase tracking-wider mb-1.5"
-                    style={{ color: 'var(--text-secondary)' }}
+                    className="text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: 'var(--text-secondary)', marginBottom: '0.35rem' }}
                   >
                     {label}
                   </p>
@@ -204,13 +227,27 @@ export default function Contact() {
                       href={href}
                       target={href.startsWith('http') ? '_blank' : undefined}
                       rel="noopener noreferrer"
-                      className="text-sm font-medium truncate block hover:underline"
-                      style={{ color: 'var(--accent)' }}
+                      className="text-sm font-medium hover:underline"
+                      style={{
+                        color:    'var(--accent)',
+                        display:  'block',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace:   'nowrap',
+                      }}
                     >
                       {value}
                     </a>
                   ) : (
-                    <p className="text-sm font-medium truncate" style={{ color: 'var(--text-primary)' }}>
+                    <p
+                      className="text-sm font-medium"
+                      style={{
+                        color:        'var(--text-primary)',
+                        overflow:     'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace:   'nowrap',
+                      }}
+                    >
                       {value}
                     </p>
                   )}
@@ -220,8 +257,12 @@ export default function Contact() {
 
             {/* Availability note */}
             <div
-              className="p-6 rounded-xl border mt-4 sm:mt-6"
-              style={{ background: 'rgba(99,102,241,0.06)', borderColor: 'var(--accent)' }}
+              style={{
+                padding:      '1.1rem 1.4rem',
+                borderRadius: '0.875rem',
+                border:       '1.5px solid var(--accent)',
+                background:   'rgba(99,102,241,0.06)',
+              }}
             >
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 <span className="font-semibold" style={{ color: 'var(--accent)' }}>
@@ -230,7 +271,7 @@ export default function Contact() {
                 I typically reply within 1–2 business days.
               </p>
             </div>
-          </motion.aside> 
+          </motion.aside>
 
           {/* ── Right — form ─────────────────────────────────────── */}
           <motion.div
@@ -238,7 +279,6 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="lg:col-span-3"
           >
             <AnimatePresence mode="wait">
 
@@ -250,58 +290,64 @@ export default function Contact() {
                   animate={{ opacity: 1, scale: 1,    y: 0  }}
                   exit={{   opacity: 0, scale: 0.95,  y: -10 }}
                   transition={{ type: 'spring', stiffness: 280, damping: 22 }}
-                  className="flex flex-col items-center justify-center text-center
-                             p-10 sm:p-12 rounded-3xl border min-h-[420px]"
                   style={{
-                    background:  'var(--bg-card)',
-                    borderColor: 'var(--border)',
+                    display:        'flex',
+                    flexDirection:  'column',
+                    alignItems:     'center',
+                    justifyContent: 'center',
+                    textAlign:      'center',
+                    padding:        '3rem 2.5rem',
+                    borderRadius:   '1.5rem',
+                    border:         '1.5px solid var(--border)',
+                    background:     'var(--bg-card)',
+                    minHeight:      '420px',
                   }}
                 >
-                  {/* Animated checkmark circle */}
                   <motion.div
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 18 }}
-                    className="w-20 h-20 rounded-full flex items-center justify-center
-                               text-4xl mb-8"
                     style={{
+                      width:      '5rem',
+                      height:     '5rem',
+                      borderRadius: '50%',
+                      display:    'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize:   '2rem',
+                      marginBottom: '2rem',
                       background: 'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
                       boxShadow:  '0 8px 32px rgba(99,102,241,0.35)',
                     }}
                   >
                     ✓
                   </motion.div>
-
                   <motion.h3
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-2xl font-extrabold mb-4"
-                    style={{ color: 'var(--text-primary)' }}
+                    className="text-2xl font-extrabold"
+                    style={{ color: 'var(--text-primary)', marginBottom: '1rem' }}
                   >
                     Message Sent! 🎉
                   </motion.h3>
-
                   <motion.p
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="mb-3 max-w-xs leading-relaxed"
-                    style={{ color: 'var(--text-secondary)' }}
+                    style={{ color: 'var(--text-secondary)', maxWidth: '20rem', lineHeight: 1.6, marginBottom: '0.75rem' }}
                   >
                     {apiMsg}
                   </motion.p>
-
                   <motion.p
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="text-sm mb-10"
-                    style={{ color: 'var(--text-secondary)' }}
+                    className="text-sm"
+                    style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem' }}
                   >
                     Check your inbox — a confirmation email is on its way.
                   </motion.p>
-
                   <motion.button
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -309,10 +355,14 @@ export default function Contact() {
                     whileHover={{ scale: 1.04, y: -2 }}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => { setStatus(null); setApiMsg(''); }}
-                    className="px-8 py-3 rounded-full text-sm font-bold text-white"
+                    className="text-sm font-bold text-white"
                     style={{
+                      padding:    '0.875rem 2rem',
+                      borderRadius: '9999px',
                       background: 'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
                       boxShadow:  '0 4px 16px rgba(99,102,241,0.35)',
+                      border:     'none',
+                      cursor:     'pointer',
                     }}
                   >
                     Send Another Message
@@ -329,12 +379,16 @@ export default function Contact() {
                   exit={{   opacity: 0 }}
                   onSubmit={handleSubmit}
                   noValidate
-                  className="p-8 sm:p-10 rounded-3xl border space-y-6"
-                  style={{
-                    background:  'var(--bg-card)',
-                    borderColor: 'var(--border)',
-                  }}
                   aria-label="Contact form"
+                  style={{
+                    background:   'var(--bg-card)',
+                    border:       '1.5px solid var(--border)',
+                    borderRadius: '1.5rem',
+                    padding:      '2.5rem 2.25rem',
+                    display:      'flex',
+                    flexDirection:'column',
+                    gap:          '1.75rem',
+                  }}
                 >
                   {/* ── API error banner ─────────────────────── */}
                   <AnimatePresence>
@@ -344,100 +398,94 @@ export default function Contact() {
                         animate={{ opacity: 1, y:  0, height: 'auto' }}
                         exit={{   opacity: 0, y: -8, height: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="flex items-start gap-3 p-5 rounded-xl border text-sm"
                         style={{
-                          background:  'rgba(248,113,113,0.08)',
-                          borderColor: '#f87171',
-                          color:       '#f87171',
+                          display:      'flex',
+                          alignItems:   'flex-start',
+                          gap:          '0.75rem',
+                          padding:      '1rem 1.25rem',
+                          borderRadius: '0.75rem',
+                          border:       '1.5px solid #f87171',
+                          background:   'rgba(248,113,113,0.08)',
+                          color:        '#f87171',
+                          fontSize:     '0.875rem',
                         }}
                         role="alert"
                       >
-                        <span className="text-lg shrink-0" aria-hidden="true">⚠️</span>
+                        <span style={{ fontSize: '1.125rem', flexShrink: 0 }} aria-hidden="true">⚠️</span>
                         <span>{apiMsg}</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
-                  {/* Name + Email */}
-                  <div className="grid sm:grid-cols-2 gap-6">
+                  {/* Name + Email — responsive two-column */}
+                  <div
+                    style={{
+                      display:             'grid',
+                      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                      gap:                 '1.5rem',
+                    }}
+                  >
                     <FormField
                       label="Full Name"
-                      id="name"
-                      type="text"
-                      name="name"
+                      id="name" type="text" name="name"
                       placeholder="Ananya Raj"
-                      value={fields.name}
-                      error={errors.name}
-                      onChange={handleChange}
-                      disabled={loading}
-                      required
+                      value={fields.name} error={errors.name}
+                      onChange={handleChange} disabled={loading} required
                     />
                     <FormField
                       label="Email Address"
-                      id="email"
-                      type="email"
-                      name="email"
+                      id="email" type="email" name="email"
                       placeholder="ananya@email.com"
-                      value={fields.email}
-                      error={errors.email}
-                      onChange={handleChange}
-                      disabled={loading}
-                      required
+                      value={fields.email} error={errors.email}
+                      onChange={handleChange} disabled={loading} required
                     />
                   </div>
 
                   {/* Subject */}
                   <FormField
                     label="Subject"
-                    id="subject"
-                    type="text"
-                    name="subject"
+                    id="subject" type="text" name="subject"
                     placeholder="Project enquiry"
-                    value={fields.subject}
-                    error={errors.subject}
-                    onChange={handleChange}
-                    disabled={loading}
-                    optional
+                    value={fields.subject} error={errors.subject}
+                    onChange={handleChange} disabled={loading} optional
                   />
 
                   {/* Message */}
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-sm font-semibold mb-2"
-                      style={{ color: 'var(--text-primary)' }}
+                      className="block text-sm font-semibold"
+                      style={{ color: 'var(--text-primary)', marginBottom: '0.5rem', display: 'block' }}
                     >
                       Message{' '}
                       <span aria-hidden="true" style={{ color: 'var(--accent)' }}>*</span>
                     </label>
                     <textarea
-                      id="message"
-                      name="message"
-                      rows={5}
+                      id="message" name="message" rows={5}
                       placeholder="Tell me about your project or idea…"
                       value={fields.message}
                       onChange={handleChange}
                       disabled={loading}
-                      required
-                      aria-required="true"
+                      required aria-required="true"
                       aria-invalid={!!errors.message}
                       aria-describedby={errors.message ? 'message-error' : undefined}
-                      className="w-full px-5 py-4 rounded-xl text-sm resize-none leading-relaxed
-                                 outline-none transition-all duration-200"
                       style={{
+                        width:        '100%',
+                        padding:      '1rem 1.25rem',
+                        borderRadius: '0.75rem',
+                        fontSize:     '0.875rem',
+                        resize:       'none',
+                        lineHeight:   1.6,
+                        outline:      'none',
+                        transition:   'border-color 0.2s',
                         background:   'var(--bg-primary)',
                         border:       `1.5px solid ${errors.message ? '#f87171' : 'var(--border)'}`,
                         color:        'var(--text-primary)',
                         opacity:      loading ? 0.6 : 1,
+                        boxSizing:    'border-box',
                       }}
-                      onFocus={(e) => {
-                        if (!errors.message) e.target.style.borderColor = 'var(--accent)';
-                      }}
-                      onBlur={(e) => {
-                        e.target.style.borderColor = errors.message
-                          ? '#f87171'
-                          : 'var(--border)';
-                      }}
+                      onFocus={(e) => { if (!errors.message) e.target.style.borderColor = 'var(--accent)'; }}
+                      onBlur={(e)  => { e.target.style.borderColor = errors.message ? '#f87171' : 'var(--border)'; }}
                     />
                     <AnimatePresence>
                       {errors.message && (
@@ -445,10 +493,9 @@ export default function Contact() {
                           initial={{ opacity: 0, y: -4 }}
                           animate={{ opacity: 1, y: 0 }}
                           exit={{   opacity: 0, y: -4 }}
-                          id="message-error"
-                          role="alert"
-                          className="text-xs mt-1.5"
-                          style={{ color: '#f87171' }}
+                          id="message-error" role="alert"
+                          className="text-xs"
+                          style={{ color: '#f87171', marginTop: '0.375rem' }}
                         >
                           {errors.message}
                         </motion.p>
@@ -462,14 +509,21 @@ export default function Contact() {
                     disabled={loading}
                     whileHover={!loading ? { scale: 1.03, y: -2 } : {}}
                     whileTap={!loading  ? { scale: 0.97 }         : {}}
-                    className="w-full py-3.5 rounded-full text-sm font-bold text-white
-                               flex items-center justify-center gap-2.5
-                               transition-opacity duration-200"
+                    className="text-sm font-bold text-white"
                     style={{
-                      background:  'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
-                      opacity:     loading ? 0.75 : 1,
-                      cursor:      loading ? 'not-allowed' : 'pointer',
-                      boxShadow:   loading ? 'none' : '0 4px 20px rgba(99,102,241,0.38)',
+                      width:          '100%',
+                      padding:        '1rem 2rem',
+                      borderRadius:   '9999px',
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: 'center',
+                      gap:            '0.625rem',
+                      background:     'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
+                      opacity:        loading ? 0.75 : 1,
+                      cursor:         loading ? 'not-allowed' : 'pointer',
+                      boxShadow:      loading ? 'none' : '0 4px 20px rgba(99,102,241,0.38)',
+                      border:         'none',
+                      transition:     'opacity 0.2s',
                     }}
                     aria-busy={loading}
                   >
@@ -478,38 +532,57 @@ export default function Contact() {
                         <motion.span
                           animate={{ rotate: 360 }}
                           transition={{ repeat: Infinity, duration: 0.75, ease: 'linear' }}
-                          className="w-4 h-4 rounded-full border-2 border-white
-                                     border-t-transparent shrink-0"
+                          style={{
+                            width:  '1rem',
+                            height: '1rem',
+                            borderRadius: '50%',
+                            border: '2px solid white',
+                            borderTopColor: 'transparent',
+                            flexShrink: 0,
+                            display: 'block',
+                          }}
                           aria-hidden="true"
                         />
                         Sending…
                       </>
                     ) : (
                       <>
-                        <svg
-                          viewBox="0 0 20 20" fill="currentColor"
-                          width="16" height="16" aria-hidden="true"
-                        >
-                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2
-                                   2 0 002.003 1.884z" />
-                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0
-                                   002-2V8.118z" />
+                        <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" aria-hidden="true">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 002.003 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                         </svg>
                         Send Message
                       </>
                     )}
                   </motion.button>
 
-                  <p className="text-xs text-center" style={{ color: 'var(--text-secondary)' }}>
+                  <p
+                    className="text-xs text-center"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
                     You&apos;ll receive an auto-confirmation to your email address.
                   </p>
                 </motion.form>
               )}
             </AnimatePresence>
           </motion.div>
-
         </div>
       </div>
+
+      {/* ── Responsive grid: 2-col on large screens ────────────────── */}
+      <style>{`
+        @media (min-width: 1024px) {
+          .lg\\:grid-cols-contact {
+            grid-template-columns: 2fr 3fr !important;
+            gap: 3rem !important;
+          }
+        }
+        @media (min-width: 640px) and (max-width: 1023px) {
+          .lg\\:grid-cols-contact {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
@@ -520,8 +593,8 @@ function FormField({ label, id, error, optional = false, disabled, ...inputProps
     <div>
       <label
         htmlFor={id}
-        className="block text-sm font-semibold mb-2"
-        style={{ color: 'var(--text-primary)' }}
+        className="text-sm font-semibold"
+        style={{ color: 'var(--text-primary)', marginBottom: '0.5rem', display: 'block' }}
       >
         {label}{' '}
         {optional ? (
@@ -538,12 +611,18 @@ function FormField({ label, id, error, optional = false, disabled, ...inputProps
         aria-required={!optional}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
-        className="w-full px-5 py-3.5 rounded-xl text-sm outline-none transition-all duration-200"
         style={{
-          background:  'var(--bg-primary)',
-          border:      `1.5px solid ${error ? '#f87171' : 'var(--border)'}`,
-          color:       'var(--text-primary)',
-          opacity:     disabled ? 0.6 : 1,
+          width:        '100%',
+          padding:      '0.875rem 1.25rem',
+          borderRadius: '0.75rem',
+          fontSize:     '0.875rem',
+          outline:      'none',
+          transition:   'border-color 0.2s',
+          background:   'var(--bg-primary)',
+          border:       `1.5px solid ${error ? '#f87171' : 'var(--border)'}`,
+          color:        'var(--text-primary)',
+          opacity:      disabled ? 0.6 : 1,
+          boxSizing:    'border-box',
         }}
         onFocus={(e) => { if (!error) e.target.style.borderColor = 'var(--accent)'; }}
         onBlur={(e)  => { e.target.style.borderColor = error ? '#f87171' : 'var(--border)'; }}
@@ -557,8 +636,8 @@ function FormField({ label, id, error, optional = false, disabled, ...inputProps
             exit={{   opacity: 0, y: -4 }}
             id={`${id}-error`}
             role="alert"
-            className="text-xs mt-1.5"
-            style={{ color: '#f87171' }}
+            className="text-xs"
+            style={{ color: '#f87171', marginTop: '0.375rem' }}
           >
             {error}
           </motion.p>

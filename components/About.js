@@ -3,15 +3,14 @@
 /**
  * About.js
  * Combined About + Skills section.
- * Includes personal info, career summary, education, stats,
- * and skill categories with animated progress bars.
+ * All spacing via inline styles to guarantee rendering (Tailwind v4 scanner bypass).
  */
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { skillCategories, stats } from '@/data/skills';
 
-/* ── Animation helpers ── */
+/* ── Animation variants ─────────────────────────────────────────────── */
 const fadeUp = {
   hidden:  { opacity: 0, y: 40 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
@@ -22,20 +21,33 @@ const stagger = (delay = 0) => ({
   visible: { transition: { staggerChildren: 0.1, delayChildren: delay } },
 });
 
-/* ── Single animated skill bar ── */
-function SkillBar({ name, level, color }) {
-  const ref  = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
-
+/* ── Animated skill bar ─────────────────────────────────────────────── */
+/* inView is passed from the parent SkillCard so all bars fire together  */
+function SkillBar({ name, level, color, inView, index = 0 }) {
   return (
-    <div ref={ref} className="mb-4">
-      <div className="flex justify-between mb-1 text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-        <span>{name}</span>
-        <span style={{ color: 'var(--text-secondary)' }}>{level}%</span>
+    <div style={{ marginBottom: '1.125rem' }}>
+      <div
+        style={{
+          display:        'flex',
+          justifyContent: 'space-between',
+          marginBottom:   '0.375rem',
+        }}
+      >
+        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+          {name}
+        </span>
+        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+          {level}%
+        </span>
       </div>
       <div
-        className="w-full h-2 rounded-full overflow-hidden"
-        style={{ background: 'var(--border)' }}
+        style={{
+          width:        '100%',
+          height:       '0.5rem',
+          borderRadius: '9999px',
+          overflow:     'hidden',
+          background:   'var(--border)',
+        }}
         role="progressbar"
         aria-valuenow={level}
         aria-valuemin={0}
@@ -43,21 +55,21 @@ function SkillBar({ name, level, color }) {
         aria-label={`${name} proficiency ${level}%`}
       >
         <motion.div
-          className="h-full rounded-full"
-          style={{ background: color }}
+          style={{ height: '100%', borderRadius: '9999px', background: color }}
           initial={{ width: 0 }}
           animate={{ width: inView ? `${level}%` : 0 }}
-          transition={{ duration: 1.2, ease: 'easeOut', delay: 0.2 }}
+          transition={{ duration: 1.1, ease: 'easeOut', delay: 0.15 + index * 0.08 }}
         />
       </div>
     </div>
   );
 }
 
-/* ── Skill category card ── */
+/* ── Skill category card ────────────────────────────────────────────── */
 function SkillCard({ category }) {
   const ref    = useRef(null);
-  const inView = useInView(ref, { once: true, margin: '-60px' });
+  /* amount:0.2 → fires when 20% of the card enters the viewport */
+  const inView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
     <motion.div
@@ -65,28 +77,43 @@ function SkillCard({ category }) {
       variants={fadeUp}
       initial="hidden"
       animate={inView ? 'visible' : 'hidden'}
-      className="p-6 rounded-2xl border card-glow"
-      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+      style={{
+        padding:      '1.75rem 1.875rem',
+        borderRadius: '1.25rem',
+        border:       '1.5px solid var(--border)',
+        background:   'var(--bg-card)',
+        transition:   'box-shadow 0.3s ease, transform 0.3s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.boxShadow = '0 0 28px rgba(99,102,241,0.2)';
+        e.currentTarget.style.transform = 'translateY(-4px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.boxShadow = 'none';
+        e.currentTarget.style.transform = 'translateY(0)';
+      }}
     >
-      <div className="flex items-center gap-3 mb-5">
-        <span className="text-2xl" aria-hidden="true">{category.icon}</span>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.375rem' }}>
+        <span style={{ fontSize: '1.5rem' }} aria-hidden="true">{category.icon}</span>
         <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
           {category.label}
         </h3>
       </div>
-      {category.skills.map((skill) => (
+      {category.skills.map((skill, i) => (
         <SkillBar
           key={skill.name}
           name={skill.name}
           level={skill.level}
           color={category.color}
+          inView={inView}
+          index={i}
         />
       ))}
     </motion.div>
   );
 }
 
-/* ── Stat highlight card ── */
+/* ── Stat card ──────────────────────────────────────────────────────── */
 function StatCard({ stat, delay }) {
   const ref    = useRef(null);
   const inView = useInView(ref, { once: true });
@@ -97,110 +124,189 @@ function StatCard({ stat, delay }) {
       initial={{ opacity: 0, scale: 0.85 }}
       animate={inView ? { opacity: 1, scale: 1 } : {}}
       transition={{ duration: 0.5, delay }}
-      className="p-6 rounded-2xl border text-center"
-      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+      style={{
+        padding:      '1.75rem 1rem',
+        borderRadius: '1.25rem',
+        border:       '1.5px solid var(--border)',
+        background:   'var(--bg-card)',
+        textAlign:    'center',
+        transition:   'box-shadow 0.3s ease',
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(99,102,241,0.18)'}
+      onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
     >
-      <div className="text-3xl mb-2" aria-hidden="true">{stat.icon}</div>
-      <div className="text-3xl font-extrabold gradient-text">{stat.value}</div>
-      <div className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>{stat.label}</div>
+      <div style={{ fontSize: '2rem', marginBottom: '0.625rem' }} aria-hidden="true">
+        {stat.icon}
+      </div>
+      <div className="text-3xl font-extrabold gradient-text" style={{ marginBottom: '0.375rem' }}>
+        {stat.value}
+      </div>
+      <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+        {stat.label}
+      </div>
     </motion.div>
   );
 }
 
-/* ── Main export ── */
+/* ── Main export ────────────────────────────────────────────────────── */
 export default function About() {
   const headerRef  = useRef(null);
   const headerView = useInView(headerRef, { once: true, margin: '-80px' });
 
+  const quickFacts = [
+    { icon: '🎓', label: 'Education', value: 'B.Tech. Computer Science, 2026' },
+    { icon: '📍', label: 'Location',  value: 'Kolkata, West Bengal'           },
+    { icon: '💻', label: 'GitHub',    value: 'github.com/ananyar148'          },
+    { icon: '🌍', label: 'Languages', value: 'English, Hindi, Maithli'        },
+    { icon: '🎯', label: 'Goal',      value: 'Build impactful, accessible products' },
+  ];
+
+  const interests = [
+    'Web Development', 'UI/UX Design', 'Open Source',
+    'Machine Learning', 'System Design', 'Tech Blogging', 'Photography',
+  ];
+
+  const goals = [
+    'Contribute to major open source projects',
+    'Build a SaaS product from scratch',
+    'Deepen knowledge of cloud architecture (AWS/GCP)',
+  ];
+
   return (
     <section
-      className="section-padding pt-28"
-      style={{ background: 'var(--bg-secondary)' }}
+      className="section-padding"
+      style={{ background: 'var(--bg-secondary)', paddingTop: '7rem' }}
     >
       <div className="container-custom">
 
-        {/* Section header */}
+        {/* ── Section header ───────────────────────────────────────── */}
         <motion.div
           ref={headerRef}
           variants={stagger()}
           initial="hidden"
           animate={headerView ? 'visible' : 'hidden'}
-          className="text-center mb-16"
+          style={{ textAlign: 'center', marginBottom: '3.5rem' }}
         >
-          <motion.p variants={fadeUp} className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--accent)' }}>
+          <motion.p
+            variants={fadeUp}
+            className="text-sm font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--accent)', marginBottom: '0.75rem' }}
+          >
             Get to know me
           </motion.p>
-          <motion.h2 variants={fadeUp} className="text-4xl sm:text-5xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+          <motion.h2
+            variants={fadeUp}
+            className="text-4xl sm:text-5xl font-extrabold"
+            style={{ color: 'var(--text-primary)' }}
+          >
             About <span className="gradient-text">Me</span>
           </motion.h2>
         </motion.div>
 
-        {/* Personal info + summary */}
-        <div className="grid lg:grid-cols-2 gap-12 mb-16 items-center">
-          {/* Left – text */}
+        {/* ── Personal info + interests/goals ──────────────────────── */}
+        <div
+          style={{
+            display:             'grid',
+            gridTemplateColumns: '1fr',
+            gap:                 '2.5rem',
+            marginBottom:        '3.5rem',
+            alignItems:          'start',
+          }}
+          className="about-two-col"
+        >
+          {/* Left — bio + quick facts */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+            <h3
+              className="text-2xl font-bold"
+              style={{ color: 'var(--text-primary)', marginBottom: '1.125rem' }}
+            >
               Crafting digital experiences one line at a time ✨
             </h3>
-            <p className="mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              I&rsquo;m a passionate full stack developer building modern web applications. I love turning complex problems into clean,
-              user friendly solutions using the latest technologies.
+            <p
+              className="leading-relaxed"
+              style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}
+            >
+              I&rsquo;m a passionate full stack developer building modern web applications. I love
+              turning complex problems into clean, user friendly solutions using the latest
+              technologies.
             </p>
-            <p className="mb-6 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-              When I&rsquo;m not coding, you&rsquo;ll find me exploring new frameworks,
-              contributing to open source projects, or enjoying a good cup of coffee
-              while reading about software architecture.
+            <p
+              className="leading-relaxed"
+              style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}
+            >
+              When I&rsquo;m not coding, you&rsquo;ll find me exploring new frameworks, contributing
+              to open source projects, or enjoying a good cup of coffee while reading about
+              software architecture.
             </p>
 
             {/* Quick facts */}
-            <ul className="space-y-3" aria-label="Personal details">
-              {[
-                { icon: '🎓', label: 'Education',  value: 'B.Tech. Computer Science, 2026' },
-                { icon: '📍', label: 'Location',   value: 'Kolkata, West Bengal'           },
-                { icon: '💻', label: 'GitHub',     value: 'github.com/ananyar148'        },
-                { icon: '🌍', label: 'Languages',  value: 'English, Hindi, Maithli'             },
-                { icon: '🎯', label: 'Goal',       value: 'Build impactful, accessible products' },
-              ].map(({ icon, label, value }) => (
-                <li key={label} className="flex items-center gap-3 text-sm">
-                  <span className="text-xl w-7 text-center" aria-hidden="true">{icon}</span>
-                  <span className="font-semibold w-24 shrink-0" style={{ color: 'var(--text-primary)' }}>{label}:</span>
+            <ul
+              style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.875rem' }}
+              aria-label="Personal details"
+            >
+              {quickFacts.map(({ icon, label, value }) => (
+                <li
+                  key={label}
+                  className="text-sm"
+                  style={{ display: 'flex', alignItems: 'center', gap: '0.875rem' }}
+                >
+                  <span
+                    style={{ fontSize: '1.25rem', width: '1.75rem', textAlign: 'center', flexShrink: 0 }}
+                    aria-hidden="true"
+                  >
+                    {icon}
+                  </span>
+                  <span
+                    className="font-semibold"
+                    style={{ color: 'var(--text-primary)', width: '6rem', flexShrink: 0 }}
+                  >
+                    {label}:
+                  </span>
                   <span style={{ color: 'var(--text-secondary)' }}>{value}</span>
                 </li>
               ))}
             </ul>
           </motion.div>
 
-          {/* Right – interests + goals */}
+          {/* Right — interests + goals */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="space-y-6"
+            style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}
           >
-            {/* Interests */}
+            {/* Interests card */}
             <div
-              className="p-6 rounded-2xl border"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+              style={{
+                padding:      '1.75rem 1.875rem',
+                borderRadius: '1.25rem',
+                border:       '1.5px solid var(--border)',
+                background:   'var(--bg-card)',
+              }}
             >
-              <h4 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>
+              <h4
+                className="font-bold text-lg"
+                style={{ color: 'var(--text-primary)', marginBottom: '1.125rem' }}
+              >
                 🎮 Interests
               </h4>
-              <div className="flex flex-wrap gap-2">
-                {['Web Development', 'UI/UX Design', 'Open Source', 'Machine Learning',
-                  'System Design', 'Tech Blogging', 'Photography'].map((item) => (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                {interests.map((item) => (
                   <span
                     key={item}
-                    className="px-3 py-1 rounded-full text-xs font-medium border"
+                    className="text-xs font-medium interest-pill"
                     style={{
-                      background: 'rgba(99,102,241,0.08)',
-                      borderColor: 'var(--accent)',
-                      color: 'var(--accent)',
+                      padding:      '0.35rem 0.875rem',
+                      borderRadius: '9999px',
+                      border:       '1.5px solid var(--accent)',
+                      background:   'rgba(99,102,241,0.08)',
+                      color:        'var(--accent)',
                     }}
                   >
                     {item}
@@ -209,23 +315,29 @@ export default function About() {
               </div>
             </div>
 
-            {/* Goals */}
+            {/* Goals card */}
             <div
-              className="p-6 rounded-2xl border"
-              style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+              style={{
+                padding:      '1.75rem 1.875rem',
+                borderRadius: '1.25rem',
+                border:       '1.5px solid var(--border)',
+                background:   'var(--bg-card)',
+              }}
             >
-              <h4 className="font-bold text-lg mb-4" style={{ color: 'var(--text-primary)' }}>
+              <h4
+                className="font-bold text-lg"
+                style={{ color: 'var(--text-primary)', marginBottom: '1.125rem' }}
+              >
                 🚀 Current Goals
               </h4>
-              <ul className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                {[
-                  // 'Master advanced TypeScript patterns',
-                  'Contribute to major open source projects',
-                  'Build a SaaS product from scratch',
-                  'Deepen knowledge of cloud architecture (AWS/GCP)',
-                ].map((goal) => (
-                  <li key={goal} className="flex items-start gap-2">
-                    <span className="text-green-400 mt-0.5">✓</span>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {goals.map((goal) => (
+                  <li
+                    key={goal}
+                    className="text-sm"
+                    style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem', color: 'var(--text-secondary)' }}
+                  >
+                    <span style={{ color: '#4ade80', flexShrink: 0, marginTop: '0.1rem' }}>✓</span>
                     {goal}
                   </li>
                 ))}
@@ -234,43 +346,76 @@ export default function About() {
           </motion.div>
         </div>
 
-        {/* Stats row */}
+        {/* ── Stats row ────────────────────────────────────────────── */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={stagger()}
-          className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16"
+          style={{
+            display:             'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap:                 '1.25rem',
+            marginBottom:        '4rem',
+          }}
+          className="stats-four-col"
         >
           {stats.map((stat, i) => (
             <StatCard key={stat.label} stat={stat} delay={i * 0.1} />
           ))}
         </motion.div>
 
-        {/* Skills header */}
+        {/* ── Skills header ────────────────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-10"
+          style={{ textAlign: 'center', marginBottom: '2.5rem' }}
         >
-          <p className="text-sm font-semibold uppercase tracking-widest mt-3 mb-3" style={{ color: 'var(--accent)' }}>
+          <p
+            className="text-sm font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--accent)', marginBottom: '0.75rem' }}
+          >
             What I work with
           </p>
-          <h2 className="text-3xl sm:text-4xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+          <h2
+            className="text-3xl sm:text-4xl font-extrabold"
+            style={{ color: 'var(--text-primary)' }}
+          >
             Technical <span className="gradient-text">Skills</span>
           </h2>
         </motion.div>
 
-        {/* Skill category cards */}
-        <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-6">
+        {/* ── Skill category cards ─────────────────────────────────── */}
+        <div
+          style={{
+            display:             'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 260px), 1fr))',
+            gap:                 '1.5rem',
+          }}
+        >
           {skillCategories.map((cat) => (
             <SkillCard key={cat.id} category={cat} />
           ))}
         </div>
 
       </div>
+
+      {/* ── Responsive helpers ───────────────────────────────────────── */}
+      <style>{`
+        @media (min-width: 1024px) {
+          .about-two-col {
+            grid-template-columns: 1fr 1fr !important;
+            gap: 3rem !important;
+          }
+        }
+        @media (min-width: 640px) {
+          .stats-four-col {
+            grid-template-columns: repeat(4, 1fr) !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

@@ -4,18 +4,19 @@
  * Projects.js
  * Projects grid with category filter + Professional Experience timeline.
  * Clicking a card opens ProjectModal with detailed info.
+ * All spacing via inline styles to guarantee rendering (Tailwind v4 scanner bypass).
  */
 
 import { useState, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { projects } from '@/data/projects';
+import { projects }    from '@/data/projects';
 import { experiences } from '@/data/experience';
-import ProjectCard from './ProjectCard';
+import ProjectCard  from './ProjectCard';
 import ProjectModal from './ProjectModal';
 
 const CATEGORIES = ['All', 'Full Stack', 'Frontend', 'Backend'];
 
-/* ── Experience timeline entry ── */
+/* ── Experience timeline entry ─────────────────────────────────────── */
 function ExperienceEntry({ exp, index }) {
   const ref    = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
@@ -26,27 +27,52 @@ function ExperienceEntry({ exp, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="mb-6 sm:mb-8 lg:mb-10"
+      style={{ marginBottom: '2rem' }}
     >
-      {/* Card */}
       <div
-        className="p-6 sm:p-8 lg:p-10 rounded-2xl border transition-all duration-300 hover:shadow-lg"
-        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+        style={{
+          padding:      '2rem 2.25rem',
+          borderRadius: '1.25rem',
+          border:       '1.5px solid var(--border)',
+          background:   'var(--bg-card)',
+          transition:   'box-shadow 0.3s ease',
+        }}
+        onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 8px 32px rgba(0,0,0,0.2)'}
+        onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
       >
-        {/* Header: Role, Company, and Duration */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-7">
-          <div className="flex-1">
-            <h4 className="text-lg sm:text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+        {/* Header: Role + Duration */}
+        <div
+          style={{
+            display:        'flex',
+            flexWrap:       'wrap',
+            justifyContent: 'space-between',
+            alignItems:     'flex-start',
+            gap:            '1rem',
+            marginBottom:   '1.5rem',
+          }}
+        >
+          <div style={{ flex: 1, minWidth: '12rem' }}>
+            <h4
+              className="text-lg font-bold"
+              style={{ color: 'var(--text-primary)', marginBottom: '0.4rem' }}
+            >
               {exp.role}
             </h4>
-            <p className="text-sm sm:text-base font-semibold" style={{ color: exp.color }}>
+            <p className="text-sm font-semibold" style={{ color: exp.color }}>
               {exp.company}
             </p>
           </div>
-          <div className="text-right shrink-0">
+          <div style={{ textAlign: 'right', flexShrink: 0 }}>
             <span
-              className="inline-block text-xs font-medium px-3 py-1.5 rounded-full border mb-2"
-              style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+              className="text-xs font-medium"
+              style={{
+                display:      'inline-block',
+                padding:      '0.35rem 0.875rem',
+                borderRadius: '9999px',
+                border:       '1.5px solid var(--border)',
+                color:        'var(--text-secondary)',
+                marginBottom: '0.4rem',
+              }}
             >
               {exp.duration}
             </span>
@@ -57,35 +83,58 @@ function ExperienceEntry({ exp, index }) {
         </div>
 
         {/* Divider */}
-        <div className="w-full h-px mb-6" style={{ background: 'var(--border)' }} />
+        <div style={{ width: '100%', height: '1px', background: 'var(--border)', marginBottom: '1.5rem' }} />
 
         {/* Description */}
-        <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
+        <p
+          className="text-sm leading-relaxed"
+          style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}
+        >
           {exp.description}
         </p>
 
         {/* Responsibilities */}
-        <div className="mb-6">
-          <ul className="space-y-3" aria-label="Responsibilities">
-            {exp.responsibilities.map((r) => (
-              <li key={r} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <span className="shrink-0 mt-0.5" style={{ color: exp.color }} aria-hidden="true">▸</span>
-                <span>{r}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul
+          style={{ listStyle: 'none', padding: 0, margin: '0 0 1.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}
+          aria-label="Responsibilities"
+        >
+          {exp.responsibilities.map((r) => (
+            <li
+              key={r}
+              className="text-sm"
+              style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', color: 'var(--text-secondary)' }}
+            >
+              <span style={{ color: exp.color, flexShrink: 0, marginTop: '0.125rem' }} aria-hidden="true">▸</span>
+              <span>{r}</span>
+            </li>
+          ))}
+        </ul>
 
         {/* Achievements */}
         {exp.achievements.length > 0 && (
-          <div className="mb-6 p-5 rounded-lg" style={{ background: `${exp.color}08`, borderLeft: `3px solid ${exp.color}` }}>
-            <h5 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
+          <div
+            style={{
+              padding:      '1.25rem 1.5rem',
+              borderRadius: '0.75rem',
+              background:   `${exp.color}08`,
+              borderLeft:   `3px solid ${exp.color}`,
+              marginBottom: '1.5rem',
+            }}
+          >
+            <h5
+              className="text-xs font-bold uppercase tracking-wider"
+              style={{ color: 'var(--text-primary)', marginBottom: '0.875rem' }}
+            >
               🏆 Key Achievements
             </h5>
-            <ul className="space-y-3">
+            <ul style={{ listStyle: 'none', padding: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
               {exp.achievements.map((a) => (
-                <li key={a} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  <span className="shrink-0 mt-0.5 text-yellow-400" aria-hidden="true">★</span>
+                <li
+                  key={a}
+                  className="text-sm"
+                  style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', color: 'var(--text-secondary)' }}
+                >
+                  <span style={{ flexShrink: 0, marginTop: '0.125rem', color: '#facc15' }} aria-hidden="true">★</span>
                   <span>{a}</span>
                 </li>
               ))}
@@ -94,15 +143,17 @@ function ExperienceEntry({ exp, index }) {
         )}
 
         {/* Tech stack */}
-        <div className="flex flex-wrap gap-2">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {exp.technologies.map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
+              className="text-xs font-medium"
               style={{
-                background: `${exp.color}12`,
-                borderColor: exp.color,
-                color: exp.color,
+                padding:      '0.35rem 0.75rem',
+                borderRadius: '0.5rem',
+                border:       `1.5px solid ${exp.color}`,
+                background:   `${exp.color}12`,
+                color:        exp.color,
               }}
             >
               {tech}
@@ -114,9 +165,9 @@ function ExperienceEntry({ exp, index }) {
   );
 }
 
-/* ── Main export ── */
+/* ── Main export ────────────────────────────────────────────────────── */
 export default function Projects() {
-  const [activeFilter, setFilter] = useState('All');
+  const [activeFilter,     setFilter]   = useState('All');
   const [selectedProject, setSelected] = useState(null);
 
   const headerRef  = useRef(null);
@@ -128,33 +179,53 @@ export default function Projects() {
 
   return (
     <section
-      className="section-padding pt-28"
-      style={{ background: 'var(--bg-primary)' }}
+      className="section-padding"
+      style={{ background: 'var(--bg-primary)', paddingTop: '7rem' }}
     >
       <div className="container-custom">
 
-        {/* ── Projects header ── */}
+        {/* ── Projects header ─────────────────────────────────────── */}
         <motion.div
           ref={headerRef}
           initial={{ opacity: 0, y: 30 }}
           animate={headerView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          style={{ textAlign: 'center', marginBottom: '2.5rem' }}
         >
-          <p className="text-sm font-semibold uppercase tracking-widest mb-3 mt-7" style={{ color: 'var(--accent)' }}>
-            What I've built
+          <p
+            className="text-sm font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--accent)', marginBottom: '0.75rem' }}
+          >
+            What I&apos;ve built
           </p>
-          <h2 className="text-4xl sm:text-5xl font-extrabold mb-6" style={{ color: 'var(--text-primary)' }}>
+          <h2
+            className="text-4xl sm:text-5xl font-extrabold"
+            style={{ color: 'var(--text-primary)', margin: '0.75rem 0 1.25rem' }}
+          >
             My <span className="gradient-text">Projects</span>
           </h2>
-          <p className="max-w-2xl mx-auto text-base leading-relaxed px-4 sm:px-6" style={{ color: 'var(--text-secondary)' }}>
+          <p
+            className="text-base leading-relaxed"
+            style={{ color: 'var(--text-secondary)', maxWidth: '38rem', margin: '0 auto', padding: '0 1rem' }}
+          >
             A collection of projects that showcase my skills across the full stack.
             Click any card to learn more.
           </p>
         </motion.div>
 
-        {/* Filter pills */}
-        <div className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-10 mt-8 sm:mt-10" role="group" aria-label="Filter projects by category">
+        {/* ── Filter pills ────────────────────────────────────────── */}
+        <div
+          role="group"
+          aria-label="Filter projects by category"
+          style={{
+            display:        'flex',
+            flexWrap:       'wrap',
+            justifyContent: 'center',
+            gap:            '0.75rem',
+            marginBottom:   '2.5rem',
+            marginTop:      '0.5rem',
+          }}
+        >
           {CATEGORIES.map((cat) => (
             <motion.button
               key={cat}
@@ -162,11 +233,15 @@ export default function Projects() {
               whileTap={{ scale: 0.95 }}
               onClick={() => setFilter(cat)}
               aria-pressed={activeFilter === cat}
-              className="px-5 py-2 rounded-full text-sm font-semibold border transition-all duration-200"
+              className="text-sm font-semibold"
               style={{
-                background: activeFilter === cat ? 'var(--accent)' : 'var(--bg-card)',
-                borderColor: activeFilter === cat ? 'var(--accent)' : 'var(--border)',
-                color: activeFilter === cat ? '#fff' : 'var(--text-secondary)',
+                padding:      '0.5rem 1.375rem',
+                borderRadius: '9999px',
+                border:       `1.5px solid ${activeFilter === cat ? 'var(--accent)' : 'var(--border)'}`,
+                background:   activeFilter === cat ? 'var(--accent)' : 'var(--bg-card)',
+                color:        activeFilter === cat ? '#fff' : 'var(--text-secondary)',
+                cursor:       'pointer',
+                transition:   'all 0.2s',
               }}
             >
               {cat}
@@ -174,19 +249,24 @@ export default function Projects() {
           ))}
         </div>
 
-        {/* Project grid */}
+        {/* ── Project grid ────────────────────────────────────────── */}
         <motion.div
           layout
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8 mb-24 sm:mb-28 lg:mb-32"
+          style={{
+            display:             'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 300px), 1fr))',
+            gap:                 '1.75rem',
+            marginBottom:        '6rem',
+          }}
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((project) => (
               <motion.div
                 key={project.id}
                 layout
-                initial={{ opacity: 0, scale: 0.9 }}
+                initial={{ opacity: 0, scale: 0.92 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
+                exit={{   opacity: 0, scale: 0.92 }}
                 transition={{ duration: 0.35 }}
               >
                 <ProjectCard project={project} onOpen={setSelected} />
@@ -195,24 +275,30 @@ export default function Projects() {
           </AnimatePresence>
         </motion.div>
 
-        {/* ── Experience section ── */}
+        {/* ── Experience section header ────────────────────────────── */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16 sm:mb-20 mt-20 sm:mt-24 lg:mt-28"
+          style={{ textAlign: 'center', marginBottom: '3rem', marginTop: '1rem' }}
         >
-          <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>
-            Where I've worked
+          <p
+            className="text-sm font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--accent)', marginBottom: '0.875rem' }}
+          >
+            Where I&apos;ve worked
           </p>
-          <h2 className="text-4xl sm:text-5xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
+          <h2
+            className="text-4xl sm:text-5xl font-extrabold"
+            style={{ color: 'var(--text-primary)' }}
+          >
             Professional <span className="gradient-text">Experience</span>
           </h2>
         </motion.div>
 
-        {/* Experience timeline */}
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        {/* ── Experience timeline ──────────────────────────────────── */}
+        <div style={{ maxWidth: '48rem', margin: '0 auto', padding: '0 1rem' }}>
           {experiences.map((exp, i) => (
             <ExperienceEntry key={exp.id} exp={exp} index={i} />
           ))}

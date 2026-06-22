@@ -3,70 +3,110 @@
 /**
  * ProjectCard.js
  * Reusable card for a single project.
- * Clicking it opens the modal via the onOpen callback.
+ * All spacing via inline styles to guarantee rendering (Tailwind v4 scanner bypass).
  */
 
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+
+const EMOJI = { 1: '🛒', 2: '📋', 3: '🤖', 4: '🌐', 5: '⚡', 6: '📊' };
 
 export default function ProjectCard({ project, onOpen }) {
   return (
     <motion.article
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3 }}
-      className="group rounded-2xl overflow-hidden border card-glow cursor-pointer
-                 flex flex-col h-full"
-      style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       onClick={() => onOpen(project)}
       onKeyDown={(e) => e.key === 'Enter' && onOpen(project)}
       tabIndex={0}
       role="button"
       aria-label={`View details for ${project.title}`}
+      style={{
+        background:    'var(--bg-card)',
+        border:        '1.5px solid var(--border)',
+        borderRadius:  '1rem',
+        overflow:      'hidden',
+        display:       'flex',
+        flexDirection: 'column',
+        height:        '100%',
+        cursor:        'pointer',
+        transition:    'box-shadow 0.3s ease, transform 0.3s ease',
+      }}
+      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 28px rgba(99,102,241,0.22)'}
+      onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
     >
-      {/* Project image */}
-      <div className="relative h-48 overflow-hidden" style={{ background: 'var(--bg-secondary)' }}>
-        {/* Placeholder — swap for a real <Image> when you have project images */}
-        <div
-          className="w-full h-full flex items-center justify-center text-6xl
-                     transition-transform duration-500 group-hover:scale-110"
-          aria-hidden="true"
+      {/* ── Image banner ───────────────────────────────────────────── */}
+      <div
+        style={{
+          position:   'relative',
+          height:     '11rem',
+          background: 'var(--bg-secondary)',
+          display:    'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize:   '4rem',
+          overflow:   'hidden',
+        }}
+        aria-hidden="true"
+      >
+        <motion.span
+          whileHover={{ scale: 1.12 }}
+          transition={{ duration: 0.4 }}
+          style={{ display: 'block', lineHeight: 1 }}
         >
-          {project.id === 1 && '🛒'}
-          {project.id === 2 && '📋'}
-          {project.id === 3 && '🤖'}
-          {project.id === 4 && '🌐'}
-          {project.id === 5 && '⚡'}
-          {project.id === 6 && '📊'}
-        </div>
+          {EMOJI[project.id] ?? '💡'}
+        </motion.span>
 
         {/* Category badge */}
         <span
-          className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold"
-          style={{ background: 'var(--accent)', color: '#fff' }}
+          className="text-xs font-semibold"
+          style={{
+            position:     'absolute',
+            top:          '0.75rem',
+            right:        '0.75rem',
+            padding:      '0.3rem 0.75rem',
+            borderRadius: '9999px',
+            background:   'var(--accent)',
+            color:        '#fff',
+          }}
         >
           {project.category}
         </span>
       </div>
 
-      {/* Card body */}
-      <div className="p-6 sm:p-7 lg:p-8 flex flex-col flex-1">
-        <h3 className="text-lg sm:text-xl font-bold mb-3 leading-tight" style={{ color: 'var(--text-primary)' }}>
+      {/* ── Card body ──────────────────────────────────────────────── */}
+      <div
+        style={{
+          padding:       '1.5rem 1.75rem',
+          display:       'flex',
+          flexDirection: 'column',
+          flex:          1,
+        }}
+      >
+        <h3
+          className="text-lg font-bold leading-tight"
+          style={{ color: 'var(--text-primary)', marginBottom: '0.625rem' }}
+        >
           {project.title}
         </h3>
-        <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: 'var(--text-secondary)' }}>
+        <p
+          className="text-sm leading-relaxed"
+          style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', flex: 1 }}
+        >
           {project.description}
         </p>
 
         {/* Tech stack badges */}
-        <div className="flex flex-wrap gap-2 mb-6">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1.5rem' }}>
           {project.technologies.slice(0, 4).map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1 rounded-lg text-xs font-medium border transition-colors"
+              className="text-xs font-medium"
               style={{
-                background: 'rgba(99,102,241,0.08)',
-                borderColor: 'var(--border)',
-                color: 'var(--text-secondary)',
+                padding:      '0.3rem 0.7rem',
+                borderRadius: '0.5rem',
+                border:       '1.5px solid var(--border)',
+                background:   'rgba(99,102,241,0.08)',
+                color:        'var(--text-secondary)',
               }}
             >
               {tech}
@@ -74,27 +114,45 @@ export default function ProjectCard({ project, onOpen }) {
           ))}
           {project.technologies.length > 4 && (
             <span
-              className="px-3 py-1 rounded-lg text-xs font-medium"
-              style={{ color: 'var(--accent)' }}
+              className="text-xs font-medium"
+              style={{ padding: '0.3rem 0.5rem', color: 'var(--accent)' }}
             >
               +{project.technologies.length - 4}
             </span>
           )}
         </div>
 
-        {/* Action links — stop propagation so clicking them doesn't also open the modal */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 mt-auto pt-4">
+        {/* Action links */}
+        <div
+          style={{
+            display:    'flex',
+            gap:        '0.75rem',
+            marginTop:  'auto',
+          }}
+        >
           <a
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-lg
-                       border transition-colors duration-200 hover:bg-opacity-10"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
+            className="text-xs font-semibold"
+            style={{
+              flex:           1,
+              display:        'flex',
+              alignItems:     'center',
+              justifyContent: 'center',
+              gap:            '0.4rem',
+              padding:        '0.6rem 1rem',
+              borderRadius:   '0.625rem',
+              border:         '1.5px solid var(--border)',
+              color:          'var(--text-secondary)',
+              textDecoration: 'none',
+              transition:     'background 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            {/* GitHub icon */}
-            <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13" aria-hidden="true">
               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
                 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
                 -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
@@ -111,9 +169,22 @@ export default function ProjectCard({ project, onOpen }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-lg
-                       transition-colors duration-200 text-white hover:opacity-90"
-            style={{ background: 'var(--accent)' }}
+            className="text-xs font-semibold"
+            style={{
+              flex:           1,
+              display:        'flex',
+              alignItems:     'center',
+              justifyContent: 'center',
+              gap:            '0.4rem',
+              padding:        '0.6rem 1rem',
+              borderRadius:   '0.625rem',
+              background:     'var(--accent)',
+              color:          '#fff',
+              textDecoration: 'none',
+              transition:     'opacity 0.2s',
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.88'}
+            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           >
             🔗 Live Demo
           </a>

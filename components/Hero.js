@@ -1,21 +1,15 @@
 'use client';
 
 /**
- * Hero.js — Landing page
- *
- * Fixes applied:
- *  - Proper vertical centering with enough top padding to clear the navbar
- *  - All 3 elements (badge, buttons, social icons) have generous spacing between them
- *  - Badge, CTA buttons are larger with more padding
- *  - Social icons have explicit top margin + gap between them
- *  - Section has min-height so it never overlaps the next section
+ * Hero.js — Landing / home page
+ * All spacing via inline styles to guarantee rendering (Tailwind v4 scanner bypass).
  */
 
 import { motion } from 'framer-motion';
 import Image      from 'next/image';
 import Link       from 'next/link';
 
-/* ── Social links ─────────────────────────────────────────────── */
+/* ── Social links ───────────────────────────────────────────────── */
 const SOCIALS = [
   {
     name: 'GitHub',
@@ -64,13 +58,13 @@ const SOCIALS = [
   },
 ];
 
-/* ── Framer Motion variants ───────────────────────────────────── */
+/* ── Motion variants ────────────────────────────────────────────── */
 const containerVariants = {
   hidden:  {},
-  visible: { transition: { staggerChildren: 0.14 } },
+  visible: { transition: { staggerChildren: 0.13 } },
 };
 const itemVariants = {
-  hidden:  { opacity: 0, y: 30 },
+  hidden:  { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
 };
 
@@ -78,73 +72,136 @@ const itemVariants = {
 export default function Hero() {
   return (
     <section
-      className="relative flex flex-col overflow-hidden"
       style={{
-        background: 'var(--bg-primary)',
-        /* Tall enough to never bleed into the About section */
-        minHeight: '100vh',
+        position:       'relative',
+        display:        'flex',
+        flexDirection:  'column',
+        minHeight:      '100vh',
+        background:     'var(--bg-primary)',
+        overflow:       'hidden',
       }}
     >
-      {/* ── Background orbs ──────────────────────────────────── */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+      {/* ── Background orbs ─────────────────────────────────────── */}
+      <div
+        style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden' }}
+        aria-hidden="true"
+      >
         <motion.div
           animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
           transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
-          className="absolute -top-40 -left-40 w-[480px] h-[480px] rounded-full blur-3xl"
-          style={{ background: 'var(--accent)', opacity: 0.13 }}
+          style={{
+            position:     'absolute',
+            top:          '-10rem',
+            left:         '-10rem',
+            width:        '480px',
+            height:       '480px',
+            borderRadius: '50%',
+            filter:       'blur(80px)',
+            background:   'var(--accent)',
+            opacity:      0.13,
+          }}
         />
         <motion.div
           animate={{ x: [0, -50, 0], y: [0, 40, 0] }}
           transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-          className="absolute top-1/2 -right-48 w-[380px] h-[380px] rounded-full blur-3xl"
-          style={{ background: '#ec4899', opacity: 0.10 }}
+          style={{
+            position:     'absolute',
+            top:          '50%',
+            right:        '-12rem',
+            width:        '380px',
+            height:       '380px',
+            borderRadius: '50%',
+            filter:       'blur(80px)',
+            background:   '#ec4899',
+            opacity:      0.10,
+          }}
         />
         <motion.div
           animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
-          className="absolute bottom-10 left-1/3 w-[320px] h-[320px] rounded-full blur-3xl"
-          style={{ background: '#06b6d4', opacity: 0.08 }}
+          style={{
+            position:     'absolute',
+            bottom:       '2.5rem',
+            left:         '33%',
+            width:        '320px',
+            height:       '320px',
+            borderRadius: '50%',
+            filter:       'blur(80px)',
+            background:   '#06b6d4',
+            opacity:      0.08,
+          }}
         />
       </div>
 
-      {/* ── Main content — vertically centred, clears the 64px navbar ── */}
-      <div className="flex-1 flex items-center relative z-10">
-        <div className="container-custom w-full py-20 lg:py-0">
+      {/* ── Main content ────────────────────────────────────────── */}
+      <div
+        style={{
+          flex:           1,
+          display:        'flex',
+          alignItems:     'center',
+          position:       'relative',
+          zIndex:         10,
+        }}
+      >
+        <div
+          className="container-custom"
+          style={{ width: '100%', paddingTop: '5rem', paddingBottom: '5rem' }}
+        >
+          {/* Two-column: text left, photo right */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }} className="hero-row">
 
-          <div className="flex flex-col-reverse lg:flex-row items-center
-                          justify-between gap-12 lg:gap-20">
-
-            {/* ── LEFT — text column ─────────────────────────── */}
+            {/* ── LEFT — text column ───────────────────────────── */}
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
-              className="flex-1 flex flex-col items-center text-center
-                         lg:items-start lg:text-left"
+              style={{
+                flex:          1,
+                display:       'flex',
+                flexDirection: 'column',
+                alignItems:    'center',
+                textAlign:     'center',
+              }}
+              className="hero-left"
             >
 
-              {/* ① Badge — bigger padding, larger text */}
-              <motion.div variants={itemVariants} className="mb-7">
+              {/* ① Available badge */}
+              <motion.div variants={itemVariants} style={{ marginBottom: '1.75rem' }}>
                 <span
-                  className="inline-flex items-center gap-3
-                             px-6 py-3 text-base font-semibold
-                             border-2 rounded-full select-none"
                   style={{
-                    borderColor: 'var(--accent)',
-                    color:       'var(--accent)',
-                    background:  'rgba(99,102,241,0.08)',
+                    display:      'inline-flex',
+                    alignItems:   'center',
+                    gap:          '0.75rem',
+                    padding:      '0.625rem 1.375rem',
+                    fontSize:     '0.9375rem',
+                    fontWeight:   600,
+                    borderRadius: '9999px',
+                    border:       '2px solid var(--accent)',
+                    color:        'var(--accent)',
+                    background:   'rgba(99,102,241,0.08)',
+                    userSelect:   'none',
                   }}
                 >
-                  {/* Pulsing green dot */}
-                  <span className="relative flex h-3 w-3 shrink-0">
+                  <span style={{ position: 'relative', display: 'flex', width: '0.75rem', height: '0.75rem', flexShrink: 0 }}>
                     <span
-                      className="animate-ping absolute inline-flex h-full
-                                 w-full rounded-full opacity-75"
-                      style={{ background: '#4ade80' }}
+                      className="animate-ping"
+                      style={{
+                        position:     'absolute',
+                        inset:        0,
+                        borderRadius: '50%',
+                        background:   '#4ade80',
+                        opacity:      0.75,
+                      }}
                     />
                     <span
-                      className="relative inline-flex rounded-full h-3 w-3"
-                      style={{ background: '#4ade80' }}
+                      style={{
+                        position:     'relative',
+                        width:        '0.75rem',
+                        height:       '0.75rem',
+                        borderRadius: '50%',
+                        background:   '#4ade80',
+                        display:      'inline-flex',
+                      }}
                     />
                   </span>
                   Available for opportunities
@@ -154,9 +211,14 @@ export default function Hero() {
               {/* ② Name */}
               <motion.h1
                 variants={itemVariants}
-                className="text-5xl sm:text-6xl xl:text-7xl font-extrabold
-                           leading-[1.1] mb-5 tracking-tight"
-                style={{ color: 'var(--text-primary)' }}
+                style={{
+                  fontSize:    'clamp(2.75rem, 6vw, 4.5rem)',
+                  fontWeight:  800,
+                  lineHeight:  1.1,
+                  letterSpacing: '-0.02em',
+                  color:       'var(--text-primary)',
+                  marginBottom: '1.125rem',
+                }}
               >
                 Hi, I&rsquo;m{' '}
                 <span className="gradient-text">Ananya Raj</span>
@@ -165,8 +227,12 @@ export default function Hero() {
               {/* ③ Role */}
               <motion.p
                 variants={itemVariants}
-                className="text-2xl sm:text-3xl font-semibold mb-6"
-                style={{ color: 'var(--accent)' }}
+                style={{
+                  fontSize:     '1.5rem',
+                  fontWeight:   600,
+                  color:        'var(--accent)',
+                  marginBottom: '1.25rem',
+                }}
               >
                 Full Stack Developer
               </motion.p>
@@ -174,87 +240,105 @@ export default function Hero() {
               {/* ④ Bio */}
               <motion.p
                 variants={itemVariants}
-                className="text-base sm:text-lg leading-relaxed
-                           mb-10 max-w-[520px]"
-                style={{ color: 'var(--text-secondary)' }}
+                style={{
+                  fontSize:     '1.0625rem',
+                  lineHeight:   1.75,
+                  color:        'var(--text-secondary)',
+                  maxWidth:     '32rem',
+                  marginBottom: '2.5rem',
+                }}
               >
                 I build elegant, performant web applications — from pixel-perfect
                 UIs to robust back-end APIs. Passionate about clean code,
                 great UX, and continuous learning.
               </motion.p>
 
-              {/* ⑤ CTA buttons — larger, fully pill-shaped */}
+              {/* ⑤ CTA buttons */}
               <motion.div
                 variants={itemVariants}
-                className="flex flex-wrap items-center justify-center
-                           lg:justify-start gap-5 mb-10"
+                style={{
+                  display:        'flex',
+                  flexWrap:       'wrap',
+                  alignItems:     'center',
+                  justifyContent: 'center',
+                  gap:            '1rem',
+                  marginBottom:   '2rem',
+                }}
+                className="hero-ctas"
               >
                 {/* Download Resume */}
                 <motion.a
                   href="/images/resume.pdf"
                   download
-                  whileHover={{ scale: 1.06, y: -3 }}
+                  whileHover={{ scale: 1.05, y: -3 }}
                   whileTap={{ scale: 0.97 }}
-                  className="inline-flex items-center gap-3
-                             px-8 py-4 rounded-full
-                             text-base font-bold text-white
-                             transition-all duration-300"
                   style={{
-                    background: 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
-                    boxShadow:  '0 6px 28px rgba(99,102,241,0.42)',
+                    display:        'inline-flex',
+                    alignItems:     'center',
+                    gap:            '0.625rem',
+                    padding:        '0.875rem 2rem',
+                    borderRadius:   '9999px',
+                    fontSize:       '0.9375rem',
+                    fontWeight:     700,
+                    color:          '#fff',
+                    textDecoration: 'none',
+                    background:     'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                    boxShadow:      '0 6px 28px rgba(99,102,241,0.42)',
+                    transition:     'opacity 0.2s',
                   }}
                 >
-                  <svg viewBox="0 0 20 20" fill="currentColor"
-                       width="18" height="18" aria-hidden="true">
+                  <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17" aria-hidden="true">
                     <path fillRule="evenodd"
-                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0
-                         01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1
-                         1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3
-                         3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0
+                         011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414
+                         1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
                       clipRule="evenodd" />
                   </svg>
                   Download Resume
                 </motion.a>
 
                 {/* Get In Touch */}
-                <Link href="/contact">
+                <Link href="/contact" style={{ textDecoration: 'none' }}>
                   <motion.span
-                    whileHover={{ scale: 1.06, y: -3 }}
+                    whileHover={{ scale: 1.05, y: -3 }}
                     whileTap={{ scale: 0.97 }}
-                    className="inline-flex items-center gap-3
-                               px-8 py-4 rounded-full
-                               text-base font-bold border-2
-                               transition-all duration-300 cursor-pointer"
                     style={{
-                      borderColor: 'var(--accent)',
-                      color:       'var(--accent)',
-                      background:  'transparent',
+                      display:        'inline-flex',
+                      alignItems:     'center',
+                      gap:            '0.625rem',
+                      padding:        '0.875rem 2rem',
+                      borderRadius:   '9999px',
+                      fontSize:       '0.9375rem',
+                      fontWeight:     700,
+                      border:         '2px solid var(--accent)',
+                      color:          'var(--accent)',
+                      background:     'transparent',
+                      cursor:         'pointer',
+                      transition:     'background 0.2s',
                     }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.background = 'rgba(99,102,241,0.10)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.background = 'transparent';
-                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.10)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                   >
-                    <svg viewBox="0 0 20 20" fill="currentColor"
-                         width="18" height="18" aria-hidden="true">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0
-                               0016 4H4a2 2 0 002.003 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2
-                               2 0 002-2V8.118z" />
+                    <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17" aria-hidden="true">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 002.003 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
                     Get In Touch
                   </motion.span>
                 </Link>
               </motion.div>
 
-              {/* ⑥ Social icons — mt-4 adds top gap, gap-5 spaces them out */}
+              {/* ⑥ Social icons */}
               <motion.div
                 variants={itemVariants}
-                className="flex items-center justify-center lg:justify-start
-                           gap-5 mt-4"
+                style={{
+                  display:        'flex',
+                  alignItems:     'center',
+                  justifyContent: 'center',
+                  gap:            '0.875rem',
+                }}
                 aria-label="Social media links"
+                className="hero-socials"
               >
                 {SOCIALS.map(({ name, href, svg }) => (
                   <motion.a
@@ -263,22 +347,25 @@ export default function Hero() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={name}
-                    whileHover={{ scale: 1.18, y: -4 }}
+                    whileHover={{ scale: 1.15, y: -4 }}
                     whileTap={{ scale: 0.9 }}
-                    className="w-13 h-13 rounded-xl flex items-center
-                               justify-center border transition-all duration-300"
                     style={{
-                      width:       '52px',
-                      height:      '52px',
-                      borderColor: 'var(--border)',
-                      background:  'var(--bg-card)',
-                      color:       'var(--text-secondary)',
+                      width:          '3rem',
+                      height:         '3rem',
+                      borderRadius:   '0.75rem',
+                      display:        'flex',
+                      alignItems:     'center',
+                      justifyContent: 'center',
+                      border:         '1.5px solid var(--border)',
+                      background:     'var(--bg-card)',
+                      color:          'var(--text-secondary)',
+                      transition:     'border-color 0.2s, color 0.2s, background 0.2s',
+                      textDecoration: 'none',
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = 'var(--accent)';
                       e.currentTarget.style.color       = 'var(--accent)';
-                      e.currentTarget.style.background  =
-                        'rgba(99,102,241,0.08)';
+                      e.currentTarget.style.background  = 'rgba(99,102,241,0.08)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)';
@@ -293,25 +380,33 @@ export default function Hero() {
 
             </motion.div>
 
-            {/* ── RIGHT — profile photo ─────────────────────── */}
+            {/* ── RIGHT — profile photo ────────────────────────── */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-              className="flex-shrink-0 flex items-center justify-center"
+              style={{
+                display:        'flex',
+                alignItems:     'center',
+                justifyContent: 'center',
+                flexShrink:     0,
+              }}
             >
               <motion.div
                 animate={{ y: [0, -14, 0] }}
                 transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="relative"
+                style={{ position: 'relative' }}
               >
                 {/* Glow halo */}
                 <div
-                  className="absolute inset-0 rounded-full blur-2xl
-                             scale-110 opacity-30"
                   style={{
-                    background:
-                      'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                    position:     'absolute',
+                    inset:        0,
+                    borderRadius: '50%',
+                    filter:       'blur(32px)',
+                    transform:    'scale(1.12)',
+                    opacity:      0.32,
+                    background:   'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
                   }}
                   aria-hidden="true"
                 />
@@ -319,27 +414,33 @@ export default function Hero() {
                 <motion.div
                   animate={{ rotate: 360 }}
                   transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
-                  className="absolute -inset-3 rounded-full border-2
-                             border-dashed opacity-25"
-                  style={{ borderColor: 'var(--accent)' }}
+                  style={{
+                    position:     'absolute',
+                    inset:        '-0.875rem',
+                    borderRadius: '50%',
+                    border:       '2px dashed var(--accent)',
+                    opacity:      0.28,
+                  }}
                   aria-hidden="true"
                 />
-                {/* Photo */}
+                {/* Photo circle */}
                 <div
-                  className="relative w-64 h-64 sm:w-72 sm:h-72
-                             xl:w-80 xl:h-80 rounded-full overflow-hidden
-                             border-[3px]"
-                  style={{ borderColor: 'var(--accent)' }}
+                  style={{
+                    position:     'relative',
+                    width:        'clamp(220px, 28vw, 320px)',
+                    height:       'clamp(220px, 28vw, 320px)',
+                    borderRadius: '50%',
+                    overflow:     'hidden',
+                    border:       '3px solid var(--accent)',
+                  }}
                 >
                   <Image
                     src="/images/ananya.png"
                     alt="Ananya Raj — Full Stack Developer"
                     fill
-                    className="object-cover object-top"
+                    style={{ objectFit: 'cover', objectPosition: 'top' }}
                     priority
-                    sizes="(max-width:640px) 256px,
-                           (max-width:1280px) 288px,
-                           320px"
+                    sizes="(max-width:640px) 220px, (max-width:1280px) 280px, 320px"
                   />
                 </div>
               </motion.div>
@@ -349,30 +450,71 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── Scroll nudge — pinned to very bottom ─────────────── */}
+      {/* ── Scroll nudge ────────────────────────────────────────── */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2 }}
-        className="relative z-10 flex flex-col items-center gap-2 pb-10"
+        style={{
+          position:       'relative',
+          zIndex:         10,
+          display:        'flex',
+          flexDirection:  'column',
+          alignItems:     'center',
+          gap:            '0.5rem',
+          paddingBottom:  '2.5rem',
+        }}
         aria-hidden="true"
       >
         <span
-          className="text-xs tracking-widest uppercase"
-          style={{ color: 'var(--text-secondary)' }}
+          style={{
+            fontSize:      '0.6875rem',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            color:         'var(--text-secondary)',
+          }}
         >
           explore
         </span>
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-px h-10 rounded-full"
           style={{
-            background:
-              'linear-gradient(to bottom, var(--accent), transparent)',
+            width:      '1px',
+            height:     '2.5rem',
+            borderRadius: '9999px',
+            background: 'linear-gradient(to bottom, var(--accent), transparent)',
           }}
         />
       </motion.div>
+
+      {/* ── Responsive layout helpers ───────────────────────────── */}
+      <style>{`
+        /* Desktop: side-by-side, left-aligned text */
+        @media (min-width: 1024px) {
+          .hero-row {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 4rem !important;
+          }
+          .hero-left {
+            align-items: flex-start !important;
+            text-align: left !important;
+          }
+          .hero-ctas {
+            justify-content: flex-start !important;
+          }
+          .hero-socials {
+            justify-content: flex-start !important;
+          }
+        }
+        /* Mobile: stack photo on top */
+        @media (max-width: 1023px) {
+          .hero-row {
+            flex-direction: column-reverse !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }
