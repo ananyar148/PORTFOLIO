@@ -1,14 +1,15 @@
 /**
  * app/layout.js — Root layout
  *
- * Shared shell for every route: global CSS, Navbar, Footer.
- * <html class="dark"> gives an immediate dark background before JS
- * hydrates and syncs with the user's localStorage preference.
+ * Shared shell: global CSS, Navbar, Footer, and the lazily-loaded Annu ChatBot.
+ * ChatBot is loaded with next/dynamic (no SSR) so it doesn't bloat the initial
+ * bundle and doesn't cause hydration mismatches.
  */
 
 import '@/styles/globals.css';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import Navbar         from '@/components/Navbar';
+import Footer         from '@/components/Footer';
+import ChatBotLoader  from '@/components/chatbot/ChatBotLoader';
 
 export const metadata = {
   title:       'Ananya Raj | Full Stack Developer',
@@ -44,6 +45,9 @@ export default function RootLayout({ children }) {
         </main>
 
         <Footer />
+
+        {/* Annu — AI chatbot assistant (lazy, client-only) */}
+        <ChatBotLoader />
       </body>
     </html>
   );

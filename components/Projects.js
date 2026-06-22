@@ -19,87 +19,74 @@ const CATEGORIES = ['All', 'Full Stack', 'Frontend', 'Backend'];
 function ExperienceEntry({ exp, index }) {
   const ref    = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-60px' });
-  const isEven = index % 2 === 0;
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: isEven ? -50 : 50 }}
-      animate={inView ? { opacity: 1, x: 0 } : {}}
-      transition={{ duration: 0.7, delay: index * 0.15 }}
-      className={`relative flex gap-6 items-start ${isEven ? 'flex-row' : 'flex-row-reverse'} 
-                  sm:flex-row sm:gap-8`}
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      className="mb-8 sm:mb-10 lg:mb-12"
     >
-      {/* Timeline dot */}
-      <div className="flex flex-col items-center shrink-0">
-        <motion.div
-          initial={{ scale: 0 }}
-          animate={inView ? { scale: 1 } : {}}
-          transition={{ delay: index * 0.15 + 0.3, type: 'spring', stiffness: 300 }}
-          className="w-4 h-4 rounded-full border-4 mt-1 shrink-0"
-          style={{ background: exp.color, borderColor: 'var(--bg-primary)' }}
-          aria-hidden="true"
-        />
-        {/* vertical line below dot (except last) */}
-        <div
-          className="w-0.5 flex-1 mt-1 min-h-[3rem]"
-          style={{ background: 'var(--border)' }}
-          aria-hidden="true"
-        />
-      </div>
-
       {/* Card */}
       <div
-        className="flex-1 p-6 rounded-2xl border mb-6"
+        className="p-6 sm:p-7 lg:p-8 rounded-2xl border transition-all duration-300 hover:shadow-lg"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
-        <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
-          <div>
-            <h4 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+        {/* Header: Role, Company, and Duration */}
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+          <div className="flex-1">
+            <h4 className="text-lg sm:text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
               {exp.role}
             </h4>
-            <p className="text-sm font-semibold" style={{ color: exp.color }}>
+            <p className="text-sm sm:text-base font-semibold" style={{ color: exp.color }}>
               {exp.company}
             </p>
           </div>
           <div className="text-right shrink-0">
             <span
-              className="text-xs font-medium px-2.5 py-1 rounded-full border"
+              className="inline-block text-xs font-medium px-2.5 py-1 rounded-full border mb-2"
               style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
             >
               {exp.duration}
             </span>
-            <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+            <p className="text-xs" style={{ color: 'var(--text-secondary)' }}>
               {exp.location} · {exp.type}
             </p>
           </div>
         </div>
 
-        <p className="text-sm mb-3 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+        {/* Divider */}
+        <div className="w-full h-px mb-5" style={{ background: 'var(--border)' }} />
+
+        {/* Description */}
+        <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)' }}>
           {exp.description}
         </p>
 
         {/* Responsibilities */}
-        <ul className="space-y-1 mb-4" aria-label="Responsibilities">
-          {exp.responsibilities.map((r) => (
-            <li key={r} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-              <span style={{ color: exp.color }} aria-hidden="true">▸</span>
-              {r}
-            </li>
-          ))}
-        </ul>
+        <div className="mb-5">
+          <ul className="space-y-2" aria-label="Responsibilities">
+            {exp.responsibilities.map((r) => (
+              <li key={r} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <span className="shrink-0 mt-0.5" style={{ color: exp.color }} aria-hidden="true">▸</span>
+                <span>{r}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         {/* Achievements */}
         {exp.achievements.length > 0 && (
-          <div className="mb-4">
-            <h5 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-primary)' }}>
+          <div className="mb-5 p-4 rounded-lg" style={{ background: `${exp.color}08`, borderLeft: `3px solid ${exp.color}` }}>
+            <h5 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
               🏆 Key Achievements
             </h5>
-            <ul className="space-y-1">
+            <ul className="space-y-2">
               {exp.achievements.map((a) => (
-                <li key={a} className="flex items-start gap-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  <span className="text-yellow-400" aria-hidden="true">★</span>
-                  {a}
+                <li key={a} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  <span className="shrink-0 mt-0.5 text-yellow-400" aria-hidden="true">★</span>
+                  <span>{a}</span>
                 </li>
               ))}
             </ul>
@@ -107,13 +94,13 @@ function ExperienceEntry({ exp, index }) {
         )}
 
         {/* Tech stack */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap gap-2">
           {exp.technologies.map((tech) => (
             <span
               key={tech}
-              className="px-2 py-0.5 rounded-md text-xs font-medium border"
+              className="px-3 py-1 rounded-lg text-xs font-medium border transition-colors"
               style={{
-                background: `${exp.color}15`,
+                background: `${exp.color}12`,
                 borderColor: exp.color,
                 color: exp.color,
               }}
@@ -154,20 +141,20 @@ export default function Projects() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--accent)' }}>
+          <p className="text-sm font-semibold uppercase tracking-widest mb-3 mt-7" style={{ color: 'var(--accent)' }}>
             What I've built
           </p>
-          <h2 className="text-4xl sm:text-5xl font-extrabold mb-4" style={{ color: 'var(--text-primary)' }}>
+          <h2 className="text-4xl sm:text-5xl font-extrabold mb-6" style={{ color: 'var(--text-primary)' }}>
             My <span className="gradient-text">Projects</span>
           </h2>
-          <p className="max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+          <p className="max-w-2xl mx-auto text-base leading-relaxed px-4 sm:px-6" style={{ color: 'var(--text-secondary)' }}>
             A collection of projects that showcase my skills across the full stack.
             Click any card to learn more.
           </p>
         </motion.div>
 
         {/* Filter pills */}
-        <div className="flex flex-wrap justify-center gap-3 mb-10" role="group" aria-label="Filter projects by category">
+        <div className="flex flex-wrap justify-center gap-3 mb-8 sm:mb-10 mt-8 sm:mt-10" role="group" aria-label="Filter projects by category">
           {CATEGORIES.map((cat) => (
             <motion.button
               key={cat}
@@ -190,7 +177,7 @@ export default function Projects() {
         {/* Project grid */}
         <motion.div
           layout
-          className="grid sm:grid-cols-2 xl:grid-cols-3 gap-6 mb-24"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 lg:gap-8 mb-24 sm:mb-28 lg:mb-32"
         >
           <AnimatePresence mode="popLayout">
             {filtered.map((project) => (
@@ -214,9 +201,9 @@ export default function Projects() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16 sm:mb-20 mt-20 sm:mt-24 lg:mt-28"
         >
-          <p className="text-sm font-semibold uppercase tracking-widest mb-3" style={{ color: 'var(--accent)' }}>
+          <p className="text-sm font-semibold uppercase tracking-widest mb-4" style={{ color: 'var(--accent)' }}>
             Where I've worked
           </p>
           <h2 className="text-4xl sm:text-5xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
@@ -225,7 +212,7 @@ export default function Projects() {
         </motion.div>
 
         {/* Experience timeline */}
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {experiences.map((exp, i) => (
             <ExperienceEntry key={exp.id} exp={exp} index={i} />
           ))}

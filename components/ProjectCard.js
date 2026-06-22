@@ -15,7 +15,7 @@ export default function ProjectCard({ project, onOpen }) {
       whileHover={{ y: -6 }}
       transition={{ duration: 0.3 }}
       className="group rounded-2xl overflow-hidden border card-glow cursor-pointer
-                 flex flex-col"
+                 flex flex-col h-full"
       style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       onClick={() => onOpen(project)}
       onKeyDown={(e) => e.key === 'Enter' && onOpen(project)}
@@ -49,20 +49,20 @@ export default function ProjectCard({ project, onOpen }) {
       </div>
 
       {/* Card body */}
-      <div className="p-5 flex flex-col flex-1">
-        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+      <div className="p-6 sm:p-7 lg:p-8 flex flex-col flex-1">
+        <h3 className="text-lg sm:text-xl font-bold mb-3 leading-tight" style={{ color: 'var(--text-primary)' }}>
           {project.title}
         </h3>
-        <p className="text-sm mb-4 flex-1 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+        <p className="text-sm leading-relaxed mb-5 flex-1" style={{ color: 'var(--text-secondary)' }}>
           {project.description}
         </p>
 
         {/* Tech stack badges */}
-        <div className="flex flex-wrap gap-1.5 mb-4">
+        <div className="flex flex-wrap gap-2 mb-6">
           {project.technologies.slice(0, 4).map((tech) => (
             <span
               key={tech}
-              className="px-2 py-0.5 rounded-md text-xs font-medium border"
+              className="px-3 py-1 rounded-lg text-xs font-medium border transition-colors"
               style={{
                 background: 'rgba(99,102,241,0.08)',
                 borderColor: 'var(--border)',
@@ -74,7 +74,7 @@ export default function ProjectCard({ project, onOpen }) {
           ))}
           {project.technologies.length > 4 && (
             <span
-              className="px-2 py-0.5 rounded-md text-xs font-medium"
+              className="px-3 py-1 rounded-lg text-xs font-medium"
               style={{ color: 'var(--accent)' }}
             >
               +{project.technologies.length - 4}
@@ -83,14 +83,14 @@ export default function ProjectCard({ project, onOpen }) {
         </div>
 
         {/* Action links — stop propagation so clicking them doesn't also open the modal */}
-        <div className="flex items-center gap-3 mt-auto">
+        <div className="flex flex-col sm:flex-row items-center gap-3 mt-auto pt-4">
           <a
             href={project.github}
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg
-                       border transition-colors duration-200"
+            className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-lg
+                       border transition-colors duration-200 hover:bg-opacity-10"
             style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
           >
             {/* GitHub icon */}
@@ -111,9 +111,9 @@ export default function ProjectCard({ project, onOpen }) {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg
-                       transition-colors duration-200"
-            style={{ background: 'var(--accent)', color: '#fff' }}
+            className="flex-1 flex items-center justify-center gap-2 text-xs font-semibold px-4 py-2.5 rounded-lg
+                       transition-colors duration-200 text-white hover:opacity-90"
+            style={{ background: 'var(--accent)' }}
           >
             🔗 Live Demo
           </a>

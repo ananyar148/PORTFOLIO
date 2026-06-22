@@ -92,37 +92,39 @@ export default function ProjectModal({ project, onClose }) {
               </div>
 
               {/* Content */}
-              <div className="p-8">
+              <div className="p-8 sm:p-10 space-y-6">
                 {/* Category + title */}
-                <span
-                  className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-3"
-                  style={{ background: 'var(--accent)', color: '#fff' }}
-                >
-                  {project.category}
-                </span>
-                <h2
-                  id="modal-title"
-                  className="text-2xl font-extrabold mb-4"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  {project.title}
-                </h2>
+                <div>
+                  <span
+                    className="inline-block px-3 py-1 rounded-full text-xs font-semibold mb-4"
+                    style={{ background: 'var(--accent)', color: '#fff' }}
+                  >
+                    {project.category}
+                  </span>
+                  <h2
+                    id="modal-title"
+                    className="text-2xl sm:text-3xl font-extrabold"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {project.title}
+                  </h2>
+                </div>
 
                 {/* Long description */}
-                <p className="leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
+                <p className="leading-relaxed text-base" style={{ color: 'var(--text-secondary)' }}>
                   {project.longDescription}
                 </p>
 
                 {/* Technologies */}
-                <div className="mb-6">
-                  <h3 className="text-sm font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
+                <div>
+                  <h3 className="text-sm font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-primary)' }}>
                     Technologies Used
                   </h3>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-3">
                     {project.technologies.map((tech) => (
                       <span
                         key={tech}
-                        className="px-3 py-1 rounded-lg text-sm font-medium border"
+                        className="px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors"
                         style={{
                           background: 'rgba(99,102,241,0.1)',
                           borderColor: 'var(--accent)',
@@ -136,15 +138,15 @@ export default function ProjectModal({ project, onClose }) {
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex flex-wrap gap-4">
+                <div className="flex flex-col sm:flex-row gap-4 pt-4">
                   <motion.a
                     href={project.github}
                     target="_blank"
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-1 min-w-[140px] flex items-center justify-center gap-2
-                               py-3 rounded-xl text-sm font-semibold border transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2
+                               py-3 px-6 rounded-xl text-sm font-semibold border transition-colors"
                     style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                   >
                     {/* GitHub icon */}
@@ -166,8 +168,8 @@ export default function ProjectModal({ project, onClose }) {
                     rel="noopener noreferrer"
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
-                    className="flex-1 min-w-[140px] flex items-center justify-center gap-2
-                               py-3 rounded-xl text-sm font-semibold text-white"
+                    className="flex-1 flex items-center justify-center gap-2
+                               py-3 px-6 rounded-xl text-sm font-semibold text-white transition-opacity hover:opacity-90"
                     style={{
                       background: 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
                     }}
