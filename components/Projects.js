@@ -26,17 +26,17 @@ function ExperienceEntry({ exp, index }) {
       initial={{ opacity: 0, y: 20 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="mb-8 sm:mb-10 lg:mb-12"
+      className="mb-6 sm:mb-8 lg:mb-10"
     >
       {/* Card */}
       <div
-        className="p-6 sm:p-7 lg:p-8 rounded-2xl border transition-all duration-300 hover:shadow-lg"
+        className="p-6 sm:p-8 lg:p-10 rounded-2xl border transition-all duration-300 hover:shadow-lg"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
         {/* Header: Role, Company, and Duration */}
-        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-5">
+        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6 sm:mb-7">
           <div className="flex-1">
-            <h4 className="text-lg sm:text-xl font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
+            <h4 className="text-lg sm:text-xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
               {exp.role}
             </h4>
             <p className="text-sm sm:text-base font-semibold" style={{ color: exp.color }}>
@@ -45,7 +45,7 @@ function ExperienceEntry({ exp, index }) {
           </div>
           <div className="text-right shrink-0">
             <span
-              className="inline-block text-xs font-medium px-2.5 py-1 rounded-full border mb-2"
+              className="inline-block text-xs font-medium px-3 py-1.5 rounded-full border mb-2"
               style={{ borderColor: 'var(--border)', color: 'var(--text-secondary)' }}
             >
               {exp.duration}
@@ -57,16 +57,16 @@ function ExperienceEntry({ exp, index }) {
         </div>
 
         {/* Divider */}
-        <div className="w-full h-px mb-5" style={{ background: 'var(--border)' }} />
+        <div className="w-full h-px mb-6" style={{ background: 'var(--border)' }} />
 
         {/* Description */}
-        <p className="text-sm leading-relaxed mb-5" style={{ color: 'var(--text-secondary)' }}>
+        <p className="text-sm leading-relaxed mb-6" style={{ color: 'var(--text-secondary)' }}>
           {exp.description}
         </p>
 
         {/* Responsibilities */}
-        <div className="mb-5">
-          <ul className="space-y-2" aria-label="Responsibilities">
+        <div className="mb-6">
+          <ul className="space-y-3" aria-label="Responsibilities">
             {exp.responsibilities.map((r) => (
               <li key={r} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                 <span className="shrink-0 mt-0.5" style={{ color: exp.color }} aria-hidden="true">▸</span>
@@ -78,11 +78,11 @@ function ExperienceEntry({ exp, index }) {
 
         {/* Achievements */}
         {exp.achievements.length > 0 && (
-          <div className="mb-5 p-4 rounded-lg" style={{ background: `${exp.color}08`, borderLeft: `3px solid ${exp.color}` }}>
+          <div className="mb-6 p-5 rounded-lg" style={{ background: `${exp.color}08`, borderLeft: `3px solid ${exp.color}` }}>
             <h5 className="text-xs font-bold uppercase tracking-wider mb-3" style={{ color: 'var(--text-primary)' }}>
               🏆 Key Achievements
             </h5>
-            <ul className="space-y-2">
+            <ul className="space-y-3">
               {exp.achievements.map((a) => (
                 <li key={a} className="flex items-start gap-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   <span className="shrink-0 mt-0.5 text-yellow-400" aria-hidden="true">★</span>
@@ -98,7 +98,7 @@ function ExperienceEntry({ exp, index }) {
           {exp.technologies.map((tech) => (
             <span
               key={tech}
-              className="px-3 py-1 rounded-lg text-xs font-medium border transition-colors"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors"
               style={{
                 background: `${exp.color}12`,
                 borderColor: exp.color,
@@ -212,7 +212,7 @@ export default function Projects() {
         </motion.div>
 
         {/* Experience timeline */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
           {experiences.map((exp, i) => (
             <ExperienceEntry key={exp.id} exp={exp} index={i} />
           ))}
