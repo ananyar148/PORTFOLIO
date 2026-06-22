@@ -3,96 +3,108 @@
  *
  * POST /api/chat
  *
- * Authentication strategy:
- *   - Uses training.json service account to obtain a Google OAuth2 access token
- *   - Falls back to GEMINI_API_KEY if Vertex AI is unavailable
- *   - Uses @google/genai SDK pointed at the Gemini Developer API endpoint
+ * Calls Gemini via the @google/genai SDK in Vertex AI mode (global region).
+ * Service-account credentials are read from training.json — bearer-token auth
+ * is handled entirely server-side; nothing sensitive reaches the browser.
  *
- * The private key NEVER reaches the browser — server-side only.
- *
- * Body:  { message: string, history: Array<{role, text}> }
- * Reply: { reply: string, navigate: string|null }
+ * Request body : { message: string, history: Array<{role,text}> }
+ * Response     : { reply: string, navigate: string|null }
  */
 
-import { NextResponse }  from 'next/server';
-import { GoogleGenAI }   from '@google/genai';
-import { JWT }           from 'google-auth-library';
-import { readFileSync }  from 'fs';
-import { resolve }       from 'path';
+import { NextResponse } from 'next/server';
+import { GoogleGenAI }  from '@google/genai';
+import { JWT }          from 'google-auth-library';
+import { readFileSync } from 'fs';
+import { resolve }      from 'path';
 
-/* ── Load service-account credentials ──────────────────────────── */
-let CREDENTIALS = null;
+/* ── Load service-account key ───────────────────────────────────── */
+let SA = null;
 try {
-  CREDENTIALS = JSON.parse(
-    readFileSync(resolve(process.cwd(), 'training.json'), 'utf-8')
-  );
-} catch {
-  console.warn('[chat/route] training.json not found — will use GEMINI_API_KEY');
+  SA = JSON.parse(readFileSync(resolve(process.cwd(), 'training.json'), 'utf-8'));
+  console.log('[chat/route] ✓ training.json loaded, project:', SA.project_id);
+} catch (err) {
+  console.warn('[chat/route] training.json not found:', err.message);
 }
 
-/* ── Auth scope needed for Vertex AI ───────────────────────────── */
-const SCOPES = ['https://www.googleapis.com/auth/cloud-platform'];
+const PROJECT_ID = SA?.project_id ?? process.env.GOOGLE_CLOUD_PROJECT;
+const LOCATION   = 'global';           // always global region per requirement
 
-/* Lazy singleton JWT client — used to get service-account access token */
-let _jwtClient = null;
+/* ── Lazy JWT client ────────────────────────────────────────────── */
+let _jwt = null;
 function getJWT() {
-  if (!CREDENTIALS) return null;
-  if (!_jwtClient) {
-    _jwtClient = new JWT({
-      email:  CREDENTIALS.client_email,
-      key:    CREDENTIALS.private_key,
-      scopes: SCOPES,
+  if (!SA) return null;
+  if (!_jwt) {
+    _jwt = new JWT({
+      email:  SA.client_email,
+      key:    SA.private_key,
+      scopes: ['https://www.googleapis.com/auth/cloud-platform'],
     });
   }
-  return _jwtClient;
+  return _jwt;
 }
 
-/**
- * Get an authenticated GoogleGenAI client.
- * Priority:
- *   1. Service account (training.json) → get access token → use as apiKey
- *   2. GEMINI_API_KEY env var
- */
-async function getGenAI() {
-  /* Try service account first */
+/* ── Build a GoogleGenAI instance ───────────────────────────────── */
+async function buildGenAI() {
+  /* Option A — service account: get a bearer token and inject it */
   const jwt = getJWT();
-  if (jwt) {
+  if (jwt && PROJECT_ID) {
     try {
       const { token } = await jwt.getAccessToken();
       if (token) {
-        /* Pass the OAuth2 bearer token via authClient pattern */
+        /*
+         * Vertex AI mode sends the token correctly as:
+         *   Authorization: Bearer <token>
+         * rather than x-goog-api-key, which is what caused the 400.
+         */
         return new GoogleGenAI({
-          apiKey:       token,
-          apiVersion:   'v1beta',
+          vertexai:  true,
+          project:   PROJECT_ID,
+          location:  LOCATION,
+          googleAuthOptions: {
+            authClient: jwt,
+          },
         });
       }
     } catch (e) {
-      console.warn('[chat/route] Service account token failed, using API key:', e.message);
+      console.warn('[chat/route] SA token error – falling back to API key:', e.message);
     }
   }
 
-  /* Fallback: plain API key */
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey || apiKey === 'your_gemini_api_key_here') {
-    throw new Error('No valid auth: set GEMINI_API_KEY in .env.local or fix training.json');
+  /* Option B — plain Gemini API key (fallback) */
+  const key = process.env.GEMINI_API_KEY;
+  if (!key || key === 'your_gemini_api_key_here') {
+    throw new Error(
+      'No Gemini credentials available. ' +
+      'Ensure training.json is present and valid, or set GEMINI_API_KEY in .env.local.'
+    );
   }
-  return new GoogleGenAI({ apiKey });
+  console.log('[chat/route] Using GEMINI_API_KEY (Developer API)');
+  return new GoogleGenAI({ apiKey: key });
 }
 
-/* ── System instruction — Annu's full knowledge base ───────────── */
+/* ── Model ──────────────────────────────────────────────────────── */
+const MODEL = 'gemini-2.5-flash';
+
+/* ── System prompt ──────────────────────────────────────────────── */
 const SYSTEM_INSTRUCTION = `
-You are "Annu", a friendly and professional virtual assistant for Ananya Raj's
-developer portfolio website. You help visitors learn about Ananya and navigate
-the site. Be warm, concise, and helpful — never robotic. Keep answers under
-150 words unless asked for more detail. Use emojis sparingly.
+You are "Annu", a friendly and professional virtual assistant embedded in
+Ananya Raj's developer portfolio website. Help visitors learn about Ananya
+and navigate the site.
+
+PERSONALITY:
+- Warm, concise, conversational — never robotic
+- Use emojis sparingly for friendliness
+- Keep answers under 150 words unless the visitor asks for detail
+- Only answer questions related to Ananya's portfolio and work
+- For off-topic questions politely say you only know about Ananya's work
 
 ABOUT ANANYA RAJ:
-- Full Stack Developer with 3+ years of experience
+- Full Stack Developer, 3+ years experience
 - Specialises in React, Next.js, Node.js, PostgreSQL, MongoDB
 - Education: B.Sc. Computer Science, 2023
 - GitHub: https://github.com/ananyar148
 - Email: ananya@email.com
-- Currently open to full-time roles and freelance projects
+- Open to full-time roles and freelance projects
 
 SKILLS:
 - Frontend: HTML5, CSS3, JavaScript, React, Next.js, Tailwind CSS
@@ -101,148 +113,96 @@ SKILLS:
 - Tools: Git, GitHub, VS Code, Postman, Figma
 
 PROJECTS:
-1. E-Commerce Platform – Next.js, Node.js, MongoDB, Stripe payments, admin dashboard
-2. Task Management App – React, PostgreSQL, Socket.io, drag-and-drop boards
-3. AI Chat Interface – React, OpenAI API, streaming responses, multi-model support
-4. REST API Boilerplate – Node.js, Express.js, PostgreSQL, JWT auth, Jest tests
-5. Real-time Dashboard – Recharts, WebSocket, live data, CSV export
-6. Developer Portfolio v1 – Vanilla HTML/CSS/JS first portfolio
+1. E-Commerce Platform – Next.js, Node.js, MongoDB, Stripe, admin dashboard
+2. Task Management App – React, PostgreSQL, Socket.io, drag-and-drop
+3. AI Chat Interface – React, OpenAI API, streaming, multi-model support
+4. REST API Boilerplate – Node.js, Express, PostgreSQL, JWT auth, Jest
+5. Real-time Dashboard – Recharts, WebSocket, CSV export
+6. Developer Portfolio v1 – Vanilla HTML/CSS/JS
 
 EXPERIENCE:
 - Junior Full Stack Developer @ TechCorp Solutions (Jan 2024–Present)
-  Builds React dashboards and Node.js APIs for a SaaS product
-- Freelance Frontend Developer (Jun–Dec 2023)
-  Delivered 8 client projects with 100% satisfaction
-- Open Source Contributor (2022–Present)
-  120+ GitHub stars, PRs merged into popular libraries
+- Freelance Frontend Developer (Jun–Dec 2023) – 8 projects, 100% satisfaction
+- Open Source Contributor (2022–Present) – 120+ GitHub stars
 
-PORTFOLIO PAGES:
+SITE PAGES:
 - Home: /
 - About (bio + skills): /about
 - Projects + Experience: /projects
 - Contact form: /contact
 
-RULES:
-- Only answer questions about Ananya's portfolio and work
-- For unrelated questions, say you only know about Ananya's work
-- When someone asks to navigate, confirm you're redirecting them
+When the visitor asks to navigate somewhere, confirm you are redirecting them
+and keep your reply to one sentence.
 `.trim();
 
-/* ── Navigation intent detector ────────────────────────────────── */
+/* ── Navigation intent detection ────────────────────────────────── */
 const NAV_PATTERNS = [
-  { pattern: /\b(home|go back|landing|start page)\b/i,              route: '/'         },
-  { pattern: /\b(about|who is|her background|about page)\b/i,       route: '/about'    },
-  { pattern: /\b(project|work|portfolio|built|created|show work)\b/i, route: '/projects' },
-  { pattern: /\b(contact|reach|hire|get in touch|email her)\b/i,    route: '/contact'  },
+  { re: /\b(home|start|landing|main page|go back)\b/i,               route: '/'         },
+  { re: /\b(about|who is|her background|about page)\b/i,             route: '/about'    },
+  { re: /\b(project|work|portfolio|built|show work|what.*built)\b/i, route: '/projects' },
+  { re: /\b(contact|reach|hire|get in touch|email her)\b/i,          route: '/contact'  },
 ];
 
-function detectNavigation(message) {
-  const isNavRequest = /\b(go to|take me|show me|open|navigate|visit|redirect)\b/i.test(message);
-  if (!isNavRequest) return null;
-  for (const { pattern, route } of NAV_PATTERNS) {
-    if (pattern.test(message)) return route;
+function detectNav(msg) {
+  const isRequest = /\b(go to|take me|show me|open|navigate|visit|redirect|see)\b/i.test(msg);
+  if (!isRequest) return null;
+  for (const { re, route } of NAV_PATTERNS) {
+    if (re.test(msg)) return route;
   }
   return null;
-}
-
-/* ── Build Vertex AI request body ───────────────────────────────── */
-function buildRequestBody(history, message) {
-  /* Convert our history format → Vertex AI Content[] */
-  const historyContents = history
-    .filter((m) => m.role === 'user' || m.role === 'model')
-    .map((m) => ({
-      role:  m.role,
-      parts: [{ text: m.text }],
-    }));
-
-  return {
-    systemInstruction: {
-      role:  'system',
-      parts: [{ text: SYSTEM_INSTRUCTION }],
-    },
-    contents: [
-      ...historyContents,
-      { role: 'user', parts: [{ text: message }] },
-    ],
-    generationConfig: {
-      maxOutputTokens: 512,
-      temperature:     0.7,
-      topP:            0.9,
-    },
-    safetySettings: [
-      { category: 'HARM_CATEGORY_HARASSMENT',        threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_HATE_SPEECH',       threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_SEXUALLY_EXPLICIT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-      { category: 'HARM_CATEGORY_DANGEROUS_CONTENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
-    ],
-  };
 }
 
 /* ── POST handler ───────────────────────────────────────────────── */
 export async function POST(request) {
 
-  /* Parse body */
+  /* 1. Parse body */
   let body;
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
-  }
+  try { body = await request.json(); }
+  catch { return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 }); }
 
   const { message, history = [] } = body;
-
   if (!message?.trim()) {
     return NextResponse.json({ error: 'Message is required' }, { status: 400 });
   }
 
-  /* Fast nav check — no AI needed */
-  const navigate = detectNavigation(message);
+  /* 2. Fast navigation check */
+  const navigate = detectNav(message);
 
+  /* 3. Call Gemini */
   try {
-    /* Get a fresh OAuth2 access token from the service account */
-    const jwt         = getJWT();
-    const tokenResult = await jwt.getAccessToken();
-    const accessToken = tokenResult.token;
+    const ai = await buildGenAI();
 
-    if (!accessToken) {
-      throw new Error('Failed to obtain access token from service account');
-    }
+    /* Build history: user/model turns only */
+    const geminiHistory = history
+      .filter((m) => m.role === 'user' || m.role === 'model')
+      .map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
 
-    /* Call Vertex AI Gemini */
-    const vertexRes = await fetch(VERTEX_URL, {
-      method:  'POST',
-      headers: {
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${accessToken}`,
+    /* Multi-turn chat session */
+    const chat = ai.chats.create({
+      model:  MODEL,
+      config: {
+        systemInstruction: SYSTEM_INSTRUCTION,
+        maxOutputTokens:   512,
+        temperature:       0.7,
       },
-      body: JSON.stringify(buildRequestBody(history, message.trim())),
+      history: geminiHistory,
     });
 
-    if (!vertexRes.ok) {
-      const errBody = await vertexRes.text();
-      console.error('[chat/route] Vertex AI error:', vertexRes.status, errBody);
-      throw new Error(`Vertex AI returned ${vertexRes.status}`);
-    }
-
-    const data  = await vertexRes.json();
-
-    /* Extract text from Vertex AI response structure */
-    const reply =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+    const response = await chat.sendMessage({ message: message.trim() });
+    const reply    = response.text?.trim()
       ?? "I'm sorry, I couldn't generate a response right now.";
 
     return NextResponse.json({ reply, navigate }, { status: 200 });
 
   } catch (err) {
-    console.error('[chat/route] Error:', err?.message ?? err);
+    console.error('[chat/route] Gemini error:', err?.message ?? err);
 
-    /* Graceful fallback — UI never breaks */
     return NextResponse.json(
       {
         reply:
-          `I'm having a little trouble connecting to my AI brain right now. 🤔\n\n` +
-          `You can still ask me about Ananya's **skills**, **projects**, or **experience**, ` +
-          `or say *"take me to contact"* to navigate the site!`,
+          `I'm having a little trouble connecting right now. 🤔\n\n` +
+          `You can ask me about Ananya's **skills**, **projects**, **experience**, ` +
+          `or say *"take me to projects"* to navigate the site!`,
         navigate,
         error: true,
       },
@@ -251,7 +211,6 @@ export async function POST(request) {
   }
 }
 
-/* Reject other HTTP methods */
 export function GET()    { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }
 export function PUT()    { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }
 export function DELETE() { return NextResponse.json({ error: 'Method not allowed' }, { status: 405 }); }

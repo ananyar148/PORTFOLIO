@@ -20,7 +20,7 @@ const INFO_ITEMS = [
   },
   {
     icon: '📍', label: 'Location',
-    value: 'Your City, Country',
+    value: 'Kolkata, India',
     href:  null,
   },
   {
@@ -144,18 +144,23 @@ export default function Contact() {
             Let&apos;s talk
           </p>
           <h2
-            className="text-4xl sm:text-5xl font-extrabold mb-4"
+            className="text-4xl sm:text-5xl font-extrabold mb-6 mt-6"
             style={{ color: 'var(--text-primary)' }}
           >
             Get In <span className="gradient-text">Touch</span>
           </h2>
-          <p className="max-w-lg mx-auto" style={{ color: 'var(--text-secondary)' }}>
-            Have a project in mind or just want to say hi? My inbox is always open.
-            I&apos;ll do my best to get back to you promptly.
-          </p>
+         <div className="w-full flex justify-center">
+  <p
+    className="max-w-2xl text-center text-base leading-relaxed px-4 sm:px-6 mb-30"
+    style={{ color: "var(--text-secondary)" }}
+  >
+    Have a project in mind or just want to say hi? My inbox is always open.
+    I&apos;ll do my best to get back to you promptly.
+  </p>
+</div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-5 gap-12 max-w-5xl mx-auto">
+        <div className="mt-20 sm:mt-24 grid lg:grid-cols-5 gap-8 sm:gap-10 lg:gap-12 max-w-5xl mx-auto">
 
           {/* ── Left — contact info ──────────────────────────────── */}
           <motion.aside
@@ -163,11 +168,11 @@ export default function Contact() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="lg:col-span-2 space-y-4"
+           className="lg:col-span-2 mt-8 sm:mt-12 p-6 sm:p-8 rounded-2xl space-y-6 sm:space-y-8"
             aria-label="Contact information"
           >
             <h3
-              className="text-xl font-bold mb-6"
+              className="text-xl font-bold mb-6 sm:mb-8"
               style={{ color: 'var(--text-primary)' }}
             >
               Contact Info
@@ -178,18 +183,18 @@ export default function Contact() {
                 key={label}
                 whileHover={{ x: 4 }}
                 transition={{ duration: 0.2 }}
-                className="flex items-center gap-4 p-4 rounded-xl border"
+                className="flex items-center gap-5 p-6 rounded-xl border transition-all duration-200"
                 style={{
                   background:   'var(--bg-card)',
                   borderColor:  'var(--border)',
                 }}
               >
-                <span className="text-2xl w-10 text-center shrink-0" aria-hidden="true">
+                <span className="text-2xl w-11 text-center shrink-0" aria-hidden="true">
                   {icon}
                 </span>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p
-                    className="text-xs font-semibold uppercase tracking-wider mb-0.5"
+                    className="text-xs font-semibold uppercase tracking-wider mb-1.5"
                     style={{ color: 'var(--text-secondary)' }}
                   >
                     {label}
@@ -215,17 +220,17 @@ export default function Contact() {
 
             {/* Availability note */}
             <div
-              className="p-4 rounded-xl border mt-2"
+              className="p-6 rounded-xl border mt-4 sm:mt-6"
               style={{ background: 'rgba(99,102,241,0.06)', borderColor: 'var(--accent)' }}
             >
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 <span className="font-semibold" style={{ color: 'var(--accent)' }}>
                   Response time:
                 </span>{' '}
                 I typically reply within 1–2 business days.
               </p>
             </div>
-          </motion.aside>
+          </motion.aside> 
 
           {/* ── Right — form ─────────────────────────────────────── */}
           <motion.div
@@ -246,7 +251,7 @@ export default function Contact() {
                   exit={{   opacity: 0, scale: 0.95,  y: -10 }}
                   transition={{ type: 'spring', stiffness: 280, damping: 22 }}
                   className="flex flex-col items-center justify-center text-center
-                             p-12 rounded-3xl border min-h-[420px]"
+                             p-10 sm:p-12 rounded-3xl border min-h-[420px]"
                   style={{
                     background:  'var(--bg-card)',
                     borderColor: 'var(--border)',
@@ -258,7 +263,7 @@ export default function Contact() {
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.1, type: 'spring', stiffness: 300, damping: 18 }}
                     className="w-20 h-20 rounded-full flex items-center justify-center
-                               text-4xl mb-6"
+                               text-4xl mb-8"
                     style={{
                       background: 'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
                       boxShadow:  '0 8px 32px rgba(99,102,241,0.35)',
@@ -271,7 +276,7 @@ export default function Contact() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-2xl font-extrabold mb-3"
+                    className="text-2xl font-extrabold mb-4"
                     style={{ color: 'var(--text-primary)' }}
                   >
                     Message Sent! 🎉
@@ -281,7 +286,7 @@ export default function Contact() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 }}
-                    className="mb-2 max-w-xs"
+                    className="mb-3 max-w-xs leading-relaxed"
                     style={{ color: 'var(--text-secondary)' }}
                   >
                     {apiMsg}
@@ -291,7 +296,7 @@ export default function Contact() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
-                    className="text-sm mb-8"
+                    className="text-sm mb-10"
                     style={{ color: 'var(--text-secondary)' }}
                   >
                     Check your inbox — a confirmation email is on its way.
@@ -324,7 +329,7 @@ export default function Contact() {
                   exit={{   opacity: 0 }}
                   onSubmit={handleSubmit}
                   noValidate
-                  className="p-8 rounded-3xl border space-y-5"
+                  className="p-8 sm:p-10 rounded-3xl border space-y-6"
                   style={{
                     background:  'var(--bg-card)',
                     borderColor: 'var(--border)',
@@ -339,7 +344,7 @@ export default function Contact() {
                         animate={{ opacity: 1, y:  0, height: 'auto' }}
                         exit={{   opacity: 0, y: -8, height: 0 }}
                         transition={{ duration: 0.25 }}
-                        className="flex items-start gap-3 p-4 rounded-xl border text-sm"
+                        className="flex items-start gap-3 p-5 rounded-xl border text-sm"
                         style={{
                           background:  'rgba(248,113,113,0.08)',
                           borderColor: '#f87171',
@@ -354,7 +359,7 @@ export default function Contact() {
                   </AnimatePresence>
 
                   {/* Name + Email */}
-                  <div className="grid sm:grid-cols-2 gap-5">
+                  <div className="grid sm:grid-cols-2 gap-6">
                     <FormField
                       label="Full Name"
                       id="name"
@@ -399,7 +404,7 @@ export default function Contact() {
                   <div>
                     <label
                       htmlFor="message"
-                      className="block text-sm font-semibold mb-1.5"
+                      className="block text-sm font-semibold mb-2"
                       style={{ color: 'var(--text-primary)' }}
                     >
                       Message{' '}
@@ -417,7 +422,7 @@ export default function Contact() {
                       aria-required="true"
                       aria-invalid={!!errors.message}
                       aria-describedby={errors.message ? 'message-error' : undefined}
-                      className="w-full px-4 py-3 rounded-xl text-sm resize-none
+                      className="w-full px-5 py-4 rounded-xl text-sm resize-none leading-relaxed
                                  outline-none transition-all duration-200"
                       style={{
                         background:   'var(--bg-primary)',
@@ -515,7 +520,7 @@ function FormField({ label, id, error, optional = false, disabled, ...inputProps
     <div>
       <label
         htmlFor={id}
-        className="block text-sm font-semibold mb-1.5"
+        className="block text-sm font-semibold mb-2"
         style={{ color: 'var(--text-primary)' }}
       >
         {label}{' '}
@@ -533,7 +538,7 @@ function FormField({ label, id, error, optional = false, disabled, ...inputProps
         aria-required={!optional}
         aria-invalid={!!error}
         aria-describedby={error ? `${id}-error` : undefined}
-        className="w-full px-4 py-3 rounded-xl text-sm outline-none transition-all duration-200"
+        className="w-full px-5 py-3.5 rounded-xl text-sm outline-none transition-all duration-200"
         style={{
           background:  'var(--bg-primary)',
           border:      `1.5px solid ${error ? '#f87171' : 'var(--border)'}`,

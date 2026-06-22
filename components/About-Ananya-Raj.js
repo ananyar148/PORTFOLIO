@@ -15,22 +15,22 @@ const INTERESTS = [
   'Web Development',
   'UI/UX Design',
   'Open Source',
-  'Machine Learning',
+  // 'Machine Learning',
   'System Design',
   'Tech Blogging',
   'Photography',
 ];
 
 const PERSONAL_DETAILS = [
-  { icon: '🎓', label: 'Education', value: 'B.Sc. Computer Science, 2023' },
-  { icon: '📍', label: 'Location', value: 'Your City, Country' },
+  { icon: '🎓', label: 'Education', value: 'B.Tech in Computer Science, 2026' },
+  { icon: '📍', label: 'Location', value: 'Kolkata, West Bengal' },
   { icon: '💻', label: 'GitHub', value: 'github.com/ananyar148' },
-  { icon: '🌍', label: 'Languages', value: 'English (fluent)' },
+  { icon: '🌍', label: 'Languages', value: 'English, Hindi, Maithili' },
   { icon: '🎯', label: 'Goal', value: 'Build impactful, accessible products' },
 ];
 
 const CURRENT_GOALS = [
-  'Master advanced TypeScript patterns',
+  'Master advanced JavaScript patterns',
   'Contribute to major open-source projects',
   'Build a SaaS product from scratch',
   'Deepen knowledge of cloud architecture (AWS/GCP)',
