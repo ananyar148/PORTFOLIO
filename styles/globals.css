@@ -85,3 +85,12 @@ body {
   box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
   transform: translateY(-4px);
 }
+
+.interest-pill {
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+.interest-pill:hover {
+  background: rgba(99, 102, 241, 0.16) !important;
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.2);
+  transform: translateY(-2px);
+}
