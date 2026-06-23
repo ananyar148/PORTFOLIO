@@ -7,8 +7,9 @@
  */
 
 import '@/styles/globals.css';
-import Navbar         from '@/components/Navbar';
-import ChatBotLoader  from '@/components/chatbot/ChatBotLoader';
+import Navbar                from '@/components/Navbar';
+import ChatBotLoader         from '@/components/chatbot/ChatBotLoader';
+import PageScrollNavigator   from '@/components/PageScrollNavigator';
 
 export const metadata = {
   title:       'Ananya Raj | Full Stack Developer',
@@ -38,6 +39,9 @@ export default function RootLayout({ children }) {
         </a>
 
         <Navbar />
+
+        {/* Scroll-gesture page navigation (wheel / swipe / keyboard) */}
+        <PageScrollNavigator />
 
         <main id="main-content">
           {children}

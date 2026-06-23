@@ -162,12 +162,12 @@ export default function About() {
   ];
 
   const interests = [
-    'Web Development', 'UI/UX Design', 'Open Source',
-    'Machine Learning', 'System Design', 'Tech Blogging', 'Photography',
+    'Web Development', 'UI/UX Design', 'Reading Books', 'Solo Travelling',
+    'System Design', 'Data Structure', 'Photography',
   ];
 
   const goals = [
-    'Contribute to major open source projects',
+    'Contribute to major full stack projects',
     'Build a SaaS product from scratch',
     'Deepen knowledge of cloud architecture (AWS/GCP)',
   ];

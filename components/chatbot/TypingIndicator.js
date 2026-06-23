@@ -1,18 +1,8 @@
 'use client';
 /**
- * TypingIndicator.js — animated "Annu is typing…" dots.
+ * TypingIndicator.js — animated dots. UI only, logic unchanged.
  */
 import { motion } from 'framer-motion';
-
-const DOT = {
-  animate: { y: [0, -5, 0] },
-  transition: (i) => ({
-    duration: 0.6,
-    repeat: Infinity,
-    delay: i * 0.15,
-    ease: 'easeInOut',
-  }),
-};
 
 export default function TypingIndicator() {
   return (
@@ -21,37 +11,55 @@ export default function TypingIndicator() {
       animate={{ opacity: 1, y: 0 }}
       exit={{   opacity: 0, y: 8 }}
       transition={{ duration: 0.2 }}
-      className="flex items-end gap-2"
+      style={{ display: 'flex', alignItems: 'flex-end', gap: '0.5rem' }}
       aria-label="Annu is typing"
     >
       {/* Bot avatar */}
       <div
-        className="w-7 h-7 rounded-full flex items-center justify-center
-                   text-xs font-bold text-white shrink-0"
         style={{
-          background: 'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
+          width:          '1.875rem',
+          height:         '1.875rem',
+          borderRadius:   '50%',
+          display:        'flex',
+          alignItems:     'center',
+          justifyContent: 'center',
+          fontSize:       '0.75rem',
+          fontWeight:     700,
+          color:          '#fff',
+          flexShrink:     0,
+          background:     'linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%)',
+          boxShadow:      '0 2px 8px rgba(59,130,246,0.4)',
         }}
         aria-hidden="true"
       >
         A
       </div>
 
-      {/* Dots */}
+      {/* Dots bubble */}
       <div
-        className="flex items-center gap-1 px-4 py-3 rounded-2xl"
         style={{
-          background:   'var(--bg-card)',
-          border:       '1px solid var(--border)',
-          borderRadius: '4px 18px 18px 18px',
+          display:      'flex',
+          alignItems:   'center',
+          gap:          '0.3rem',
+          padding:      '0.75rem 1rem',
+          borderRadius: '4px 1.125rem 1.125rem 1.125rem',
+          background:   'rgba(15,31,61,0.95)',
+          border:       '1px solid rgba(59,130,246,0.25)',
+          boxShadow:    '0 2px 12px rgba(0,0,0,0.25)',
         }}
       >
         {[0, 1, 2].map((i) => (
           <motion.span
             key={i}
-            animate={DOT.animate}
-            transition={DOT.transition(i)}
-            className="w-1.5 h-1.5 rounded-full block"
-            style={{ background: 'var(--accent)' }}
+            animate={{ y: [0, -5, 0] }}
+            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15, ease: 'easeInOut' }}
+            style={{
+              width:        '0.4rem',
+              height:       '0.4rem',
+              borderRadius: '50%',
+              display:      'block',
+              background:   '#3B82F6',
+            }}
           />
         ))}
       </div>

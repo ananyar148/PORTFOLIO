@@ -1,19 +1,14 @@
 'use client';
 /**
- * ChatBubble.js
- * Renders a single chat message bubble.
- * Supports simple **bold** markdown via inline parsing.
+ * ChatBubble.js — single chat message bubble. UI only, logic unchanged.
+ * Supports **bold** markdown and \n → <br>.
  */
 import { motion } from 'framer-motion';
 
-/* Convert **text** → <strong>text</strong> and \n → <br> */
+/* Convert **text** → <strong> and \n → <br> */
 function parseMarkdown(text) {
-  const escaped = text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  const withBold  = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  const escaped    = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const withBold   = escaped.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   const withBreaks = withBold.replace(/\n/g, '<br>');
   return withBreaks;
 }
@@ -26,15 +21,30 @@ export default function ChatBubble({ message }) {
       initial={{ opacity: 0, y: 10, scale: 0.96 }}
       animate={{ opacity: 1, y: 0,  scale: 1 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className={`flex items-end gap-2 ${isBot ? 'justify-start' : 'justify-end'}`}
+      style={{
+        display:        'flex',
+        alignItems:     'flex-end',
+        gap:            '0.5rem',
+        justifyContent: isBot ? 'flex-start' : 'flex-end',
+      }}
     >
       {/* Bot avatar */}
       {isBot && (
         <div
-          className="w-7 h-7 rounded-full flex items-center justify-center
-                     text-xs font-bold text-white shrink-0 mb-0.5"
           style={{
-            background: 'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
+            width:           '1.875rem',
+            height:          '1.875rem',
+            borderRadius:    '50%',
+            display:         'flex',
+            alignItems:      'center',
+            justifyContent:  'center',
+            fontSize:        '0.75rem',
+            fontWeight:      700,
+            color:           '#fff',
+            flexShrink:      0,
+            marginBottom:    '2px',
+            background:      'linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%)',
+            boxShadow:       '0 2px 8px rgba(59,130,246,0.4)',
           }}
           aria-hidden="true"
         >
@@ -44,22 +54,30 @@ export default function ChatBubble({ message }) {
 
       {/* Bubble */}
       <div
-        className="max-w-[78%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed"
         style={
           isBot
             ? {
-                background:  'var(--bg-card)',
-                color:       'var(--text-primary)',
-                borderRadius: '4px 18px 18px 18px',
-                border:      '1px solid var(--border)',
+                maxWidth:     '78%',
+                padding:      '0.75rem 1rem',
+                borderRadius: '4px 1.125rem 1.125rem 1.125rem',
+                fontSize:     '0.875rem',
+                lineHeight:   1.6,
+                background:   'rgba(15,31,61,0.95)',
+                color:        '#d1e8ff',
+                border:       '1px solid rgba(59,130,246,0.25)',
+                boxShadow:    '0 2px 12px rgba(0,0,0,0.25)',
               }
             : {
-                background:  'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
-                color:       '#ffffff',
-                borderRadius: '18px 4px 18px 18px',
+                maxWidth:     '78%',
+                padding:      '0.75rem 1rem',
+                borderRadius: '1.125rem 4px 1.125rem 1.125rem',
+                fontSize:     '0.875rem',
+                lineHeight:   1.6,
+                background:   'linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%)',
+                color:        '#fff',
+                boxShadow:    '0 2px 12px rgba(59,130,246,0.35)',
               }
         }
-        /* Safe: we control the markdown parser — no user HTML ever rendered */
         dangerouslySetInnerHTML={{ __html: parseMarkdown(message.text) }}
         role={isBot ? 'status' : undefined}
         aria-live={isBot ? 'polite' : undefined}

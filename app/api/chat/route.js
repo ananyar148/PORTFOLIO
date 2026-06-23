@@ -99,31 +99,49 @@ PERSONALITY:
 - For off-topic questions politely say you only know about Ananya's work
 
 ABOUT ANANYA RAJ:
-- Full Stack Developer, 3+ years experience
+- Full Stack Developer with around 1 year of hands-on experience
 - Specialises in React, Next.js, Node.js, PostgreSQL, MongoDB
-- Education: B.Sc. Computer Science, 2023
+- Education: B.Tech. Computer Science, 2026 (currently pursuing)
+- Location: Kolkata, West Bengal, India
 - GitHub: https://github.com/ananyar148
-- Email: ananya@email.com
-- Open to full-time roles and freelance projects
+- Email: ananyar@steorasystems.com
+- Languages: English, Hindi, Maithli
+- Goal: Build impactful, accessible products
+- Open to full-time roles and freelance opportunities
 
 SKILLS:
 - Frontend: HTML5, CSS3, JavaScript, React, Next.js, Tailwind CSS
 - Backend: Node.js, Express.js
 - Databases: MongoDB, PostgreSQL, MySQL
-- Tools: Git, GitHub, VS Code, Postman, Figma
+- Tools: Git, GitHub, VS Code, Postman, Figma, SQL
 
-PROJECTS:
-1. E-Commerce Platform – Next.js, Node.js, MongoDB, Stripe, admin dashboard
-2. Task Management App – React, PostgreSQL, Socket.io, drag-and-drop
-3. AI Chat Interface – React, OpenAI API, streaming, multi-model support
-4. REST API Boilerplate – Node.js, Express, PostgreSQL, JWT auth, Jest
-5. Real-time Dashboard – Recharts, WebSocket, CSV export
-6. Developer Portfolio v1 – Vanilla HTML/CSS/JS
+PROJECTS (all on GitHub at https://github.com/AnanyaRaj14):
+1. Blog App – Full Stack | React, Node.js, MongoDB, Express.js, JWT
+   GitHub: https://github.com/AnanyaRaj14/Blog-App
+2. Job Portal – Full Stack | React, Node.js, PostgreSQL, Express.js, Tailwind CSS
+   GitHub: https://github.com/AnanyaRaj14/Job_Portal
+3. Pixel Bazar – Image gallery | React, Unsplash API, CSS Modules, JavaScript
+   GitHub: https://github.com/AnanyaRaj14
+4. Todo App – Frontend | React, CSS, JavaScript, LocalStorage
+   GitHub: https://github.com/AnanyaRaj14/react-todo
+5. BG Colour Changer – Frontend | HTML, CSS, JavaScript
+   GitHub: https://github.com/AnanyaRaj14/react_bgcolor
+6. Digital Clock – Frontend | HTML, CSS, JavaScript
+   GitHub: https://github.com/AnanyaRaj14/Digital-Clock
 
 EXPERIENCE:
-- Junior Full Stack Developer @ TechCorp Solutions (Jan 2024–Present)
-- Freelance Frontend Developer (Jun–Dec 2023) – 8 projects, 100% satisfaction
-- Open Source Contributor (2022–Present) – 120+ GitHub stars
+1. Jr. Web Developer @ Lamda Infotech Pvt. Ltd., Kolkata (Dec 2025 – Feb 2026)
+   - Built responsive web pages and forms for student admission and school information systems
+   - Applied form validation, error handling, and navigation improvements to reduce user-facing errors
+   - Executed SQL database operations to store and retrieve application data
+   - Collaborated with senior developers on code reviews and features
+   Tech: HTML, CSS, JavaScript, SQL, PHP
+
+2. Freelance Frontend Developer (Jun 2024 – Nov 2024, Remote)
+   - Built a Google Form-based client data collection and notification system
+   - Connected form submissions to a database for persistent storage
+   - Implemented automated email notifications sent to both client and business owner on every submission
+   Tech: Google Forms, Google Sheets, Apps Script, Email Automation
 
 SITE PAGES:
 - Home: /
@@ -139,16 +157,33 @@ and keep your reply to one sentence.
 const NAV_PATTERNS = [
   { re: /\b(home|start|landing|main page|go back)\b/i,               route: '/'         },
   { re: /\b(about|who is|her background|about page)\b/i,             route: '/about'    },
-  { re: /\b(project|work|portfolio|built|show work|what.*built)\b/i, route: '/projects' },
+  { re: /\b(project|work|portfolio|built|show me|what.*built)\b/i,   route: '/projects' },
   { re: /\b(contact|reach|hire|get in touch|email her)\b/i,          route: '/contact'  },
 ];
 
+/* Verbs that signal navigation intent */
+const NAV_VERB = /\b(go to|take me|show me|open|navigate|visit|redirect|see|yes|sure|ok|okay|yep|yup|please|do it)\b/i;
+
 function detectNav(msg) {
-  const isRequest = /\b(go to|take me|show me|open|navigate|visit|redirect|see)\b/i.test(msg);
-  if (!isRequest) return null;
+  /* Check if message contains a nav verb OR is a short confirmation */
+  const hasVerb     = NAV_VERB.test(msg);
+  const isShort     = msg.trim().split(/\s+/).length <= 4;
+  if (!hasVerb && !isShort) return null;
+
   for (const { re, route } of NAV_PATTERNS) {
     if (re.test(msg)) return route;
   }
+  return null;
+}
+
+/* ── Fallback: extract route from Gemini's reply text ───────────── */
+/* If detectNav returned null but Gemini says "redirecting to X", trust it */
+function detectNavFromReply(reply) {
+  const r = reply.toLowerCase();
+  if (/project|portfolio|built|work/i.test(r) && /redirect|taking|navigat|going|heading/i.test(r)) return '/projects';
+  if (/about|bio|skill|background/i.test(r)    && /redirect|taking|navigat|going|heading/i.test(r)) return '/about';
+  if (/contact|reach|hire|touch/i.test(r)      && /redirect|taking|navigat|going|heading/i.test(r)) return '/contact';
+  if (/home|landing|main/i.test(r)             && /redirect|taking|navigat|going|heading/i.test(r)) return '/';
   return null;
 }
 
@@ -192,7 +227,10 @@ export async function POST(request) {
     const reply    = response.text?.trim()
       ?? "I'm sorry, I couldn't generate a response right now.";
 
-    return NextResponse.json({ reply, navigate }, { status: 200 });
+    /* Use detectNav result, or fall back to scanning Gemini's reply */
+    const finalNavigate = navigate ?? detectNavFromReply(reply);
+
+    return NextResponse.json({ reply, navigate: finalNavigate }, { status: 200 });
 
   } catch (err) {
     console.error('[chat/route] Gemini error:', err?.message ?? err);

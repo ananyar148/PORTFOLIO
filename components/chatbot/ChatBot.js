@@ -222,12 +222,12 @@ export default function ChatBot() {
               flexDirection:'column',
               borderRadius: '1rem',
               overflow:     'hidden',
-              boxShadow:    '0 25px 60px rgba(0,0,0,0.25)',
+              boxShadow:    '0 25px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(59,130,246,0.2)',
               width:        'min(380px, calc(100vw - 3rem))',
-              height:       'min(580px, calc(100vh - 140px))',
-              background:   'var(--bg-secondary)',
-              border:       '1px solid var(--border)',
-              backdropFilter: 'blur(16px)',
+              height:       'min(560px, calc(100vh - 140px))',
+              background:   'rgba(6,11,20,0.96)',
+              border:       '1px solid rgba(59,130,246,0.2)',
+              backdropFilter: 'blur(20px)',
             }}
           >
             {/* Header */}
@@ -239,13 +239,15 @@ export default function ChatBot() {
             {/* Message list */}
             <div
               style={{
-                flex:       1,
-                overflowY:  'auto',
-                padding:    '0.75rem',
-                display:    'flex',
-                flexDirection: 'column',
-                gap:        '0.75rem',
+                flex:           1,
+                overflowY:      'auto',
+                padding:        '1rem 0.875rem',
+                display:        'flex',
+                flexDirection:  'column',
+                gap:            '0.625rem',
                 scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(59,130,246,0.3) transparent',
+                background:     'linear-gradient(180deg, rgba(6,11,20,0) 0%, rgba(10,22,40,0.3) 100%)',
               }}
             >
               {messages.map((msg) => (
