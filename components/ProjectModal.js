@@ -193,7 +193,7 @@ export default function ProjectModal({ project, onClose }) {
                           padding:      '0.35rem 0.875rem',
                           borderRadius: '0.625rem',
                           border:       '1.5px solid var(--accent)',
-                          background:   'rgba(99,102,241,0.1)',
+                          background:   'rgba(59,130,246,0.1)',
                           color:        'var(--accent)',
                         }}
                       >
@@ -257,7 +257,7 @@ export default function ProjectModal({ project, onClose }) {
                       gap:            '0.5rem',
                       padding:        '0.875rem 1.5rem',
                       borderRadius:   '0.75rem',
-                      background:     'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                      background:     'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
                       color:          '#fff',
                       textDecoration: 'none',
                       transition:     'opacity 0.2s',

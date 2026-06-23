@@ -77,7 +77,7 @@ export default function Footer() {
           left:       0,
           right:      0,
           height:     '2px',
-          background: 'linear-gradient(90deg, transparent, var(--accent), #ec4899, transparent)',
+          background: 'linear-gradient(90deg, transparent, var(--accent), #06B6D4, transparent)',
           opacity:    0.6,
         }}
         aria-hidden="true"
@@ -180,7 +180,7 @@ export default function Footer() {
                 onMouseEnter={(e) => {
                   e.currentTarget.style.borderColor = 'var(--accent)';
                   e.currentTarget.style.color       = 'var(--accent)';
-                  e.currentTarget.style.background  = 'rgba(99,102,241,0.08)';
+                  e.currentTarget.style.background  = 'rgba(59,130,246,0.08)';
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.borderColor = 'var(--border)';

@@ -243,7 +243,7 @@ export default function About() {
                     key={item}
                     className="interest-pill inline-flex items-center justify-center rounded-full border px-6 py-3 text-sm font-semibold leading-relaxed sm:px-7 sm:py-3 sm:text-base lg:px-8"
                     style={{
-                      background: 'rgba(99,102,241,0.08)',
+                      background: ' "rgba(59,130,246,$($args[0].Groups[1].Value))" ',
                       borderColor: 'var(--accent)',
                       color: 'var(--accent)',
                     }}

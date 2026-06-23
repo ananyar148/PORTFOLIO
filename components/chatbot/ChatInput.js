@@ -57,7 +57,7 @@ export default function ChatInput({ onSend, disabled }) {
                    transition-all duration-200 shrink-0"
         style={{
           background: !disabled && value.trim()
-            ? 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)'
+            ? 'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)'
             : 'var(--bg-card)',
           color:   !disabled && value.trim() ? '#fff' : 'var(--text-secondary)',
           opacity: disabled ? 0.6 : 1,

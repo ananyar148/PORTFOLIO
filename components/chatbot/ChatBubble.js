@@ -34,7 +34,7 @@ export default function ChatBubble({ message }) {
           className="w-7 h-7 rounded-full flex items-center justify-center
                      text-xs font-bold text-white shrink-0 mb-0.5"
           style={{
-            background: 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+            background: 'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
           }}
           aria-hidden="true"
         >
@@ -54,7 +54,7 @@ export default function ChatBubble({ message }) {
                 border:      '1px solid var(--border)',
               }
             : {
-                background:  'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                background:  'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
                 color:       '#ffffff',
                 borderRadius: '18px 4px 18px 18px',
               }

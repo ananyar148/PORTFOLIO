@@ -9,7 +9,7 @@ export const skillCategories = [
     id: "frontend",
     label: "Frontend",
     icon: "🎨",
-    color: "#6366f1",        // indigo
+    color: "#3B82F6",        // indigo
     skills: [
       { name: "HTML5",       level: 95 },
       { name: "CSS3",        level: 90 },
@@ -44,7 +44,7 @@ export const skillCategories = [
     id: "tools",
     label: "Tools & Workflow",
     icon: "🛠️",
-    color: "#ec4899",        // pink
+    color: "#06B6D4",        // pink
     skills: [
       { name: "Git",         level: 90 },
       { name: "GitHub",      level: 88 },

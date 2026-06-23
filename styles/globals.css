@@ -8,27 +8,29 @@
 :root {
   /* Light theme */
   --bg-primary:    #ffffff;
-  --bg-secondary:  #f8fafc;
-  --bg-card:       #f1f5f9;
-  --text-primary:  #0f172a;
-  --text-secondary:#475569;
-  --accent:        #6366f1;       /* indigo-500  */
-  --accent-light:  #a5b4fc;       /* indigo-300  */
-  --border:        #e2e8f0;
-  --shadow:        0 4px 24px rgba(0,0,0,.08);
+  --bg-secondary:  #f0f9ff;
+  --bg-card:       #e0f2fe;
+  --text-primary:  #0c1a2e;
+  --text-secondary:#334155;
+  --accent:        #3B82F6;       /* electric blue   */
+  --accent-light:  #93C5FD;       /* blue-300        */
+  --accent-2:      #06B6D4;       /* cyan            */
+  --border:        #bae6fd;
+  --shadow:        0 4px 24px rgba(59,130,246,.10);
 }
 
 /* Dark theme — applied when <html class="dark"> */
 .dark {
-  --bg-primary:    #0a0a0f;
-  --bg-secondary:  #111118;
-  --bg-card:       #1a1a2e;
-  --text-primary:  #f1f5f9;
-  --text-secondary:#94a3b8;
-  --accent:        #818cf8;       /* indigo-400  */
-  --accent-light:  #6366f1;       /* indigo-500  */
-  --border:        #1e1e2e;
-  --shadow:        0 4px 24px rgba(0,0,0,.4);
+  --bg-primary:    #060b14;
+  --bg-secondary:  #0a1628;
+  --bg-card:       #0f1f3d;
+  --text-primary:  #e2f0ff;
+  --text-secondary:#7fb3d3;
+  --accent:        #3B82F6;       /* electric blue   */
+  --accent-light:  #60A5FA;       /* blue-400        */
+  --accent-2:      #06B6D4;       /* cyan            */
+  --border:        #1a3a5c;
+  --shadow:        0 4px 24px rgba(0,0,0,.45);
 }
 
 /* ---------- Base ---------- */
@@ -61,7 +63,7 @@ body {
 ::selection { background: var(--accent); color: #fff; }
 
 /* ---------- Utility helpers ---------- */
-.section-padding { padding: 6rem 0; }  /* generous top+bottom on every section */
+.section-padding { padding: 6rem 0; }
 .container-custom {
   width: 100%;
   max-width: 1200px;
@@ -69,9 +71,9 @@ body {
   padding: 0 1.5rem;
 }
 
-/* ---------- Gradient text helper ---------- */
+/* ---------- Gradient text — blue → cyan ---------- */
 .gradient-text {
-  background: linear-gradient(135deg, var(--accent) 0%, #ec4899 100%);
+  background: linear-gradient(135deg, #3B82F6 0%, #06B6D4 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -82,7 +84,7 @@ body {
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .card-glow:hover {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.25);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.28);
   transform: translateY(-4px);
 }
 
@@ -90,7 +92,7 @@ body {
   transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 .interest-pill:hover {
-  background: rgba(99, 102, 241, 0.16) !important;
-  box-shadow: 0 0 18px rgba(99, 102, 241, 0.2);
+  background: rgba(59, 130, 246, 0.16) !important;
+  box-shadow: 0 0 18px rgba(59, 130, 246, 0.22);
   transform: translateY(-2px);
 }

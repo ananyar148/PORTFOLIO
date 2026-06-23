@@ -21,7 +21,7 @@ export default function ThemeToggle() {
       className="relative w-10 h-10 rounded-full flex items-center justify-center
                  transition-colors duration-300"
       style={{
-        background: isDark ? 'rgba(129,140,248,0.15)' : 'rgba(99,102,241,0.1)',
+        background: isDark ? 'rgba(59,130,246,0.15)' : ' "rgba(59,130,246,$($args[0].Groups[1].Value))" ',
       }}
     >
       {/* Moon icon */}

@@ -85,7 +85,7 @@ function SkillCard({ category }) {
         transition:   'box-shadow 0.3s ease, transform 0.3s ease',
       }}
       onMouseEnter={(e) => {
-        e.currentTarget.style.boxShadow = '0 0 28px rgba(99,102,241,0.2)';
+        e.currentTarget.style.boxShadow = '0 0 28px rgba(59,130,246,0.2)';
         e.currentTarget.style.transform = 'translateY(-4px)';
       }}
       onMouseLeave={(e) => {
@@ -132,7 +132,7 @@ function StatCard({ stat, delay }) {
         textAlign:    'center',
         transition:   'box-shadow 0.3s ease',
       }}
-      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(99,102,241,0.18)'}
+      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 24px rgba(59,130,246,0.18)'}
       onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
     >
       <div style={{ fontSize: '2rem', marginBottom: '0.625rem' }} aria-hidden="true">
@@ -305,7 +305,7 @@ export default function About() {
                       padding:      '0.35rem 0.875rem',
                       borderRadius: '9999px',
                       border:       '1.5px solid var(--accent)',
-                      background:   'rgba(99,102,241,0.08)',
+                      background:   'rgba(59,130,246,0.08)',
                       color:        'var(--accent)',
                     }}
                   >

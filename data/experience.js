@@ -24,7 +24,7 @@ export const experiences = [
       "Led the migration of legacy class components to React hooks.",
     ],
     technologies: ["React", "Node.js", "PostgreSQL", "Tailwind CSS", "AWS"],
-    color: "#6366f1",
+    color: "#3B82F6",
   },
   {
     id: 2,

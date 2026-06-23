@@ -31,7 +31,7 @@ export default function ProjectCard({ project, onOpen }) {
         cursor:        'pointer',
         transition:    'box-shadow 0.3s ease, transform 0.3s ease',
       }}
-      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 28px rgba(99,102,241,0.22)'}
+      onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 28px rgba(59,130,246,0.22)'}
       onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
     >
       {/* ── Image banner ───────────────────────────────────────────── */}
@@ -105,7 +105,7 @@ export default function ProjectCard({ project, onOpen }) {
                 padding:      '0.3rem 0.7rem',
                 borderRadius: '0.5rem',
                 border:       '1.5px solid var(--border)',
-                background:   'rgba(99,102,241,0.08)',
+                background:   'rgba(59,130,246,0.08)',
                 color:        'var(--text-secondary)',
               }}
             >
@@ -149,7 +149,7 @@ export default function ProjectCard({ project, onOpen }) {
               textDecoration: 'none',
               transition:     'background 0.2s',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.08)'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
             <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13" aria-hidden="true">

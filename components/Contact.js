@@ -261,7 +261,7 @@ export default function Contact() {
                 padding:      '1.1rem 1.4rem',
                 borderRadius: '0.875rem',
                 border:       '1.5px solid var(--accent)',
-                background:   'rgba(99,102,241,0.06)',
+                background:   'rgba(59,130,246,0.06)',
               }}
             >
               <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
@@ -316,8 +316,8 @@ export default function Contact() {
                       justifyContent: 'center',
                       fontSize:   '2rem',
                       marginBottom: '2rem',
-                      background: 'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
-                      boxShadow:  '0 8px 32px rgba(99,102,241,0.35)',
+                      background: 'linear-gradient(135deg,var(--accent) 0%,#06B6D4 100%)',
+                      boxShadow:  '0 8px 32px rgba(59,130,246,0.35)',
                     }}
                   >
                     ✓
@@ -359,8 +359,8 @@ export default function Contact() {
                     style={{
                       padding:    '0.875rem 2rem',
                       borderRadius: '9999px',
-                      background: 'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
-                      boxShadow:  '0 4px 16px rgba(99,102,241,0.35)',
+                      background: 'linear-gradient(135deg,var(--accent) 0%,#06B6D4 100%)',
+                      boxShadow:  '0 4px 16px rgba(59,130,246,0.35)',
                       border:     'none',
                       cursor:     'pointer',
                     }}
@@ -518,10 +518,10 @@ export default function Contact() {
                       alignItems:     'center',
                       justifyContent: 'center',
                       gap:            '0.625rem',
-                      background:     'linear-gradient(135deg,var(--accent) 0%,#ec4899 100%)',
+                      background:     'linear-gradient(135deg,var(--accent) 0%,#06B6D4 100%)',
                       opacity:        loading ? 0.75 : 1,
                       cursor:         loading ? 'not-allowed' : 'pointer',
-                      boxShadow:      loading ? 'none' : '0 4px 20px rgba(99,102,241,0.38)',
+                      boxShadow:      loading ? 'none' : '0 4px 20px rgba(59,130,246,0.38)',
                       border:         'none',
                       transition:     'opacity 0.2s',
                     }}

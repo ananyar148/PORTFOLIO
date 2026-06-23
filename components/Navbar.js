@@ -155,7 +155,7 @@ export default function Navbar() {
                       className="flex items-center gap-3 px-3 py-2.5 rounded-xl
                                  text-sm font-semibold transition-colors duration-200"
                       style={{
-                        background: active ? 'rgba(99,102,241,0.10)' : 'transparent',
+                        background: active ? 'rgba(59,130,246,0.10)' : 'transparent',
                         color:      active ? 'var(--accent)' : 'var(--text-primary)',
                       }}
                     >

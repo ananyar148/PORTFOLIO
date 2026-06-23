@@ -10,7 +10,7 @@ export default function ChatHeader({ onMinimise, onClose }) {
     <div
       className="flex items-center justify-between px-4 py-3 rounded-t-2xl shrink-0"
       style={{
-        background: 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+        background: 'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
       }}
     >
       {/* Avatar + name */}

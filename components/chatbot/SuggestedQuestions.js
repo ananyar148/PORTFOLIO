@@ -29,7 +29,7 @@ export default function SuggestedQuestions({ onSelect }) {
             className="px-3 py-1.5 rounded-full text-xs font-medium border
                        transition-colors duration-200 cursor-pointer"
             style={{
-              background:   'rgba(99,102,241,0.07)',
+              background:   'rgba(59,130,246,0.07)',
               borderColor:  'var(--accent)',
               color:        'var(--accent)',
             }}

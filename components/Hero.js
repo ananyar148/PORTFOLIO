@@ -112,7 +112,7 @@ export default function Hero() {
             height:       '380px',
             borderRadius: '50%',
             filter:       'blur(80px)',
-            background:   '#ec4899',
+            background:   '#06B6D4',
             opacity:      0.10,
           }}
         />
@@ -178,7 +178,7 @@ export default function Hero() {
                     borderRadius: '9999px',
                     border:       '2px solid var(--accent)',
                     color:        'var(--accent)',
-                    background:   'rgba(99,102,241,0.08)',
+                    background:   'rgba(59,130,246,0.08)',
                     userSelect:   'none',
                   }}
                 >
@@ -282,8 +282,8 @@ export default function Hero() {
                     fontWeight:     700,
                     color:          '#fff',
                     textDecoration: 'none',
-                    background:     'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
-                    boxShadow:      '0 6px 28px rgba(99,102,241,0.42)',
+                    background:     'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
+                    boxShadow:      '0 6px 28px rgba(59,130,246,0.42)',
                     transition:     'opacity 0.2s',
                   }}
                 >
@@ -316,7 +316,7 @@ export default function Hero() {
                       cursor:         'pointer',
                       transition:     'background 0.2s',
                     }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(99,102,241,0.10)'; }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(59,130,246,0.10)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
                   >
                     <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17" aria-hidden="true">
@@ -365,7 +365,7 @@ export default function Hero() {
                     onMouseEnter={(e) => {
                       e.currentTarget.style.borderColor = 'var(--accent)';
                       e.currentTarget.style.color       = 'var(--accent)';
-                      e.currentTarget.style.background  = 'rgba(99,102,241,0.08)';
+                      e.currentTarget.style.background  = 'rgba(59,130,246,0.08)';
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = 'var(--border)';
@@ -406,7 +406,7 @@ export default function Hero() {
                     filter:       'blur(32px)',
                     transform:    'scale(1.12)',
                     opacity:      0.32,
-                    background:   'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+                    background:   'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
                   }}
                   aria-hidden="true"
                 />

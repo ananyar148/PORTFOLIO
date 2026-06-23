@@ -29,7 +29,7 @@ export default function TypingIndicator() {
         className="w-7 h-7 rounded-full flex items-center justify-center
                    text-xs font-bold text-white shrink-0"
         style={{
-          background: 'linear-gradient(135deg, var(--accent) 0%, #ec4899 100%)',
+          background: 'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
         }}
         aria-hidden="true"
       >
