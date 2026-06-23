@@ -268,8 +268,10 @@ export default function Hero() {
               >
                 {/* Download Resume */}
                 <motion.a
-                  href="/images/resume.pdf"
-                  download
+                  href="/images/ananya_raj_.pdf"
+                  download="Ananya_Raj_Resume.pdf"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   whileHover={{ scale: 1.05, y: -3 }}
                   whileTap={{ scale: 0.97 }}
                   style={{
