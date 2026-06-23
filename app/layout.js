@@ -8,7 +8,6 @@
 
 import '@/styles/globals.css';
 import Navbar         from '@/components/Navbar';
-import Footer         from '@/components/Footer';
 import ChatBotLoader  from '@/components/chatbot/ChatBotLoader';
 
 export const metadata = {
@@ -43,8 +42,6 @@ export default function RootLayout({ children }) {
         <main id="main-content">
           {children}
         </main>
-
-        <Footer />
 
         {/* Annu — AI chatbot assistant (lazy, client-only) */}
         <ChatBotLoader />

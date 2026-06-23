@@ -15,8 +15,8 @@ import { motion, AnimatePresence, useInView } from 'framer-motion';
 const INFO_ITEMS = [
   {
     icon: '📧', label: 'Email',
-    value: 'ananya@email.com',
-    href:  'mailto:ananya@email.com',
+    value: 'ananyar@steorasystems.com',
+    href:  'mailto:ananyar@steorasystems.com',
   },
   {
     icon: '📍', label: 'Location',
@@ -31,7 +31,7 @@ const INFO_ITEMS = [
   {
     icon: '🔗', label: 'LinkedIn',
     value: 'linkedin.com/in/ananyaraj',
-    href:  'https://linkedin.com',
+    href:  'https://www.linkedin.com/in/ananya-raj-796409297/',
   },
 ];
 

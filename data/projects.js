@@ -1,92 +1,85 @@
 /**
  * projects.js
- * Static data for the portfolio projects section.
- * Edit this file to update your project listings.
+ * Ananya Raj's actual project listings with real GitHub links.
  */
 
 export const projects = [
   {
     id: 1,
-    title: "E-Commerce Platform",
+    title: 'Blog App',
     description:
-      "A full-stack e-commerce application with real-time inventory, secure checkout, and admin dashboard.",
+      'A full-featured blogging platform where users can create, edit, and delete posts with rich text support.',
     longDescription:
-      "Built a complete e-commerce solution featuring product catalog management, cart & wishlist functionality, Stripe payment integration, order tracking, and an admin panel for inventory control. Implemented JWT authentication, image optimization, and server-side rendering for SEO.",
-    image: "/project-images/ecommerce.jpg",
-    technologies: ["Next.js", "Node.js", "MongoDB", "Stripe", "Tailwind CSS"],
-    github: "https://github.com",
-    demo: "https://demo.example.com",
+      'Built a complete blogging application with user authentication, CRUD operations for posts, rich-text editing, category tagging, and a responsive reading layout. Implemented search functionality and pagination for browsing articles.',
+    image: '/project-images/blog.jpg',
+    technologies: ['React', 'Node.js', 'MongoDB', 'Express.js', 'JWT'],
+    github: 'https://github.com/AnanyaRaj14/Blog-App',
     featured: true,
-    category: "Full Stack",
+    category: 'Full Stack',
   },
   {
     id: 2,
-    title: "Task Management App",
+    title: 'Job Portal',
     description:
-      "A collaborative project management tool with drag-and-drop boards, real-time updates, and team workspaces.",
+      'A job listing platform connecting candidates with employers, featuring search, filters, and application tracking.',
     longDescription:
-      "Developed a Trello-inspired task manager supporting multiple boards, lists, and cards with drag-and-drop reordering (dnd-kit). Features include real-time collaboration via WebSockets, deadline notifications, file attachments, team member assignment, and activity logs.",
-    image: "/project-images/taskmanager.jpg",
-    technologies: ["React", "Express.js", "PostgreSQL", "Socket.io", "CSS Modules"],
-    github: "https://github.com",
-    demo: "https://demo.example.com",
+      'Developed a job portal with role-based access for employers and job seekers. Employers can post and manage listings; candidates can search, filter by location/category, bookmark jobs, and track application status. Includes a dashboard for both user types.',
+    image: '/project-images/jobportal.jpg',
+    technologies: ['React', 'Node.js', 'PostgreSQL', 'Express.js', 'Tailwind CSS'],
+    github: 'https://github.com/AnanyaRaj14/Job_Portal',
     featured: true,
-    category: "Full Stack",
+    category: 'Full Stack',
   },
   {
     id: 3,
-    title: "AI Chat Interface",
+    title: 'Pixel Bazar',
     description:
-      "A sleek chat interface that integrates with multiple AI models, supporting markdown, code highlighting, and history.",
+      'A beautiful image gallery app with search, category browsing, and full-screen preview.',
     longDescription:
-      "Created a polished front-end interface for interacting with large language models. Features include markdown rendering with syntax highlighting, conversation history stored in localStorage, model switching, streaming responses, and an exportable chat log. Optimized for mobile and desktop.",
-    image: "/project-images/aichat.jpg",
-    technologies: ["React", "Tailwind CSS", "OpenAI API", "React Query"],
-    github: "https://github.com",
-    demo: "https://demo.example.com",
+      'Created an image gallery powered by the Unsplash API. Features include keyword search, category-based browsing, masonry grid layout, full-screen lightbox preview, lazy loading for performance, and the ability to download images directly.',
+    image: '/project-images/pixelbazar.jpg',
+    technologies: ['React', 'Unsplash API', 'CSS Modules', 'JavaScript'],
+    github: 'https://github.com/AnanyaRaj14',
     featured: true,
-    category: "Frontend",
+    category: 'Frontend',
   },
   {
     id: 4,
-    title: "Developer Portfolio v1",
+    title: 'Todo App',
     description:
-      "My first personal portfolio site built with HTML, CSS, and vanilla JavaScript.",
+      'A clean, minimal task manager with add, complete, filter, and delete functionality.',
     longDescription:
-      "A clean, responsive portfolio showcasing my early projects. Features a CSS-grid layout, custom animations, contact form, and project filtering. Served as the foundation for my current portfolio redesign.",
-    image: "/project-images/portfolio.jpg",
-    technologies: ["HTML", "CSS", "JavaScript"],
-    github: "https://github.com",
-    demo: "https://demo.example.com",
+      'A productivity-focused todo application with local storage persistence, task completion toggling, priority filtering (all / active / completed), and smooth animations. Built with a clean UI and keyboard accessibility in mind.',
+    image: '/project-images/todo.jpg',
+    technologies: ['React', 'CSS', 'JavaScript', 'LocalStorage'],
+    github: 'https://github.com/AnanyaRaj14/react-todo',
     featured: false,
-    category: "Frontend",
+    category: 'Frontend',
   },
   {
     id: 5,
-    title: "REST API Boilerplate",
+    title: 'BG Colour Changer',
     description:
-      "A production-ready Node.js REST API template with authentication, rate limiting, and full test coverage.",
+      'An interactive background colour picker that generates random or custom colour schemes instantly.',
     longDescription:
-      "A reusable API starter featuring JWT & refresh-token auth, role-based access control, input validation with Zod, request rate limiting, structured logging, Docker Compose setup, and Jest test suite. Designed to speed up backend project bootstrapping.",
-    image: "/project-images/api.jpg",
-    technologies: ["Node.js", "Express.js", "PostgreSQL", "Jest", "Docker"],
-    github: "https://github.com",
-    demo: "https://demo.example.com",
+      'A fun interactive tool that changes the page background colour on button click or by entering a hex/rgb value. Features include random colour generation, hex/rgb input support, colour history, and copy-to-clipboard for the current colour code.',
+    image: '/project-images/bgchanger.jpg',
+    technologies: ['HTML', 'CSS', 'JavaScript'],
+    github: 'https://github.com/AnanyaRaj14/react_bgcolor',
     featured: false,
-    category: "Backend",
+    category: 'Frontend',
   },
   {
     id: 6,
-    title: "Real-time Dashboard",
+    title: 'Digital Clock',
     description:
-      "Analytics dashboard with live charts, KPI cards, and filterable data tables.",
+      'A real-time digital clock with date display, 12/24-hour toggle, and a sleek UI.',
     longDescription:
-      "Built an analytics dashboard that consumes a mock WebSocket data stream and renders live charts using Recharts. Includes responsive data tables with column sorting and filtering, date range pickers, CSV export, and dark/light mode support.",
-    image: "/project-images/dashboard.jpg",
-    technologies: ["React", "Recharts", "Tailwind CSS", "WebSocket"],
-    github: "https://github.com",
-    demo: "https://demo.example.com",
+      'A live digital clock that displays the current time and date, updated every second. Includes a 12/24-hour format toggle, AM/PM indicator, dynamic greeting based on time of day, and a minimalist dark/light themed interface.',
+    image: '/project-images/clock.jpg',
+    technologies: ['HTML', 'CSS', 'JavaScript'],
+    github: 'https://github.com/AnanyaRaj14/Digital-Clock',
     featured: false,
-    category: "Frontend",
+    category: 'Frontend',
   },
 ];

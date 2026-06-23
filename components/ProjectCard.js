@@ -2,13 +2,13 @@
 
 /**
  * ProjectCard.js
- * Reusable card for a single project.
+ * Reusable card for a single project. No live demo button.
  * All spacing via inline styles to guarantee rendering (Tailwind v4 scanner bypass).
  */
 
 import { motion } from 'framer-motion';
 
-const EMOJI = { 1: '🛒', 2: '📋', 3: '🤖', 4: '🌐', 5: '⚡', 6: '📊' };
+const EMOJI = { 1: '�', 2: '�', 3: '🖼️', 4: '✅', 5: '🎨', 6: '�' };
 
 export default function ProjectCard({ project, onOpen }) {
   return (
@@ -34,17 +34,17 @@ export default function ProjectCard({ project, onOpen }) {
       onMouseEnter={(e) => e.currentTarget.style.boxShadow = '0 0 28px rgba(59,130,246,0.22)'}
       onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'none'}
     >
-      {/* ── Image banner ───────────────────────────────────────────── */}
+      {/* ── Image banner ─────────────────────────────────────────── */}
       <div
         style={{
-          position:   'relative',
-          height:     '11rem',
-          background: 'var(--bg-secondary)',
-          display:    'flex',
-          alignItems: 'center',
+          position:       'relative',
+          height:         '11rem',
+          background:     'var(--bg-secondary)',
+          display:        'flex',
+          alignItems:     'center',
           justifyContent: 'center',
-          fontSize:   '4rem',
-          overflow:   'hidden',
+          fontSize:       '4rem',
+          overflow:       'hidden',
         }}
         aria-hidden="true"
       >
@@ -73,7 +73,7 @@ export default function ProjectCard({ project, onOpen }) {
         </span>
       </div>
 
-      {/* ── Card body ──────────────────────────────────────────────── */}
+      {/* ── Card body ────────────────────────────────────────────── */}
       <div
         style={{
           padding:       '1.5rem 1.75rem',
@@ -122,14 +122,8 @@ export default function ProjectCard({ project, onOpen }) {
           )}
         </div>
 
-        {/* Action links */}
-        <div
-          style={{
-            display:    'flex',
-            gap:        '0.75rem',
-            marginTop:  'auto',
-          }}
-        >
+        {/* GitHub only — no live demo */}
+        <div style={{ marginTop: 'auto' }}>
           <a
             href={project.github}
             target="_blank"
@@ -137,22 +131,31 @@ export default function ProjectCard({ project, onOpen }) {
             onClick={(e) => e.stopPropagation()}
             className="text-xs font-semibold"
             style={{
-              flex:           1,
+              width:          '100%',
               display:        'flex',
               alignItems:     'center',
               justifyContent: 'center',
-              gap:            '0.4rem',
-              padding:        '0.6rem 1rem',
+              gap:            '0.5rem',
+              padding:        '0.65rem 1rem',
               borderRadius:   '0.625rem',
               border:         '1.5px solid var(--border)',
               color:          'var(--text-secondary)',
               textDecoration: 'none',
-              transition:     'background 0.2s',
+              transition:     'background 0.2s, border-color 0.2s, color 0.2s',
+              boxSizing:      'border-box',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.08)'}
-            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background    = 'rgba(59,130,246,0.08)';
+              e.currentTarget.style.borderColor   = 'var(--accent)';
+              e.currentTarget.style.color         = 'var(--accent)';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background    = 'transparent';
+              e.currentTarget.style.borderColor   = 'var(--border)';
+              e.currentTarget.style.color         = 'var(--text-secondary)';
+            }}
           >
-            <svg viewBox="0 0 16 16" fill="currentColor" width="13" height="13" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="14" height="14" aria-hidden="true">
               <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
                 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13
                 -.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66
@@ -162,31 +165,7 @@ export default function ProjectCard({ project, onOpen }) {
                 .82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0
                 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
             </svg>
-            GitHub
-          </a>
-          <a
-            href={project.demo}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-            className="text-xs font-semibold"
-            style={{
-              flex:           1,
-              display:        'flex',
-              alignItems:     'center',
-              justifyContent: 'center',
-              gap:            '0.4rem',
-              padding:        '0.6rem 1rem',
-              borderRadius:   '0.625rem',
-              background:     'var(--accent)',
-              color:          '#fff',
-              textDecoration: 'none',
-              transition:     'opacity 0.2s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.opacity = '0.88'}
-            onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-          >
-            🔗 Live Demo
+            View on GitHub
           </a>
         </div>
       </div>

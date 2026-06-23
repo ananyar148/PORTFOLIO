@@ -9,7 +9,7 @@
 import { useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const EMOJI = { 1: '🛒', 2: '📋', 3: '🤖', 4: '🌐', 5: '⚡', 6: '📊' };
+const EMOJI = { 1: '📝', 2: '💼', 3: '🖼️', 4: '✅', 5: '🎨', 6: '🕐' };
 
 export default function ProjectModal({ project, onClose }) {
   const closeRef = useRef(null);
@@ -203,7 +203,7 @@ export default function ProjectModal({ project, onClose }) {
                   </div>
                 </div>
 
-                {/* Action buttons */}
+                {/* Action buttons — GitHub only */}
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                   <motion.a
                     href={project.github}
@@ -224,10 +224,16 @@ export default function ProjectModal({ project, onClose }) {
                       border:         '1.5px solid var(--border)',
                       color:          'var(--text-primary)',
                       textDecoration: 'none',
-                      transition:     'background 0.2s',
+                      transition:     'background 0.2s, border-color 0.2s',
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.background = 'var(--bg-card)'}
-                    onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background    = 'rgba(59,130,246,0.08)';
+                      e.currentTarget.style.borderColor   = 'var(--accent)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background    = 'transparent';
+                      e.currentTarget.style.borderColor   = 'var(--border)';
+                    }}
                   >
                     <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16" aria-hidden="true">
                       <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38
@@ -240,32 +246,6 @@ export default function ProjectModal({ project, onClose }) {
                         1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
                     </svg>
                     View on GitHub
-                  </motion.a>
-                  <motion.a
-                    href={project.demo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    whileHover={{ scale: 1.04 }}
-                    whileTap={{ scale: 0.97 }}
-                    className="text-sm font-semibold"
-                    style={{
-                      flex:           1,
-                      minWidth:       '8rem',
-                      display:        'flex',
-                      alignItems:     'center',
-                      justifyContent: 'center',
-                      gap:            '0.5rem',
-                      padding:        '0.875rem 1.5rem',
-                      borderRadius:   '0.75rem',
-                      background:     'linear-gradient(135deg, var(--accent) 0%, #06B6D4 100%)',
-                      color:          '#fff',
-                      textDecoration: 'none',
-                      transition:     'opacity 0.2s',
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.opacity = '0.88'}
-                    onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-                  >
-                    🔗 Live Demo
                   </motion.a>
                 </div>
               </div>
