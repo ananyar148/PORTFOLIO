@@ -121,7 +121,7 @@ async function buildGenAI() {
 // `.trim();
 
 /* ── 4. Model and System Prompt ─────────────────────────────────── */
-const MODEL = 'gemini-2.0-flash';
+const MODEL = 'gemini-3.5-flash';
 
 const SYSTEM_INSTRUCTION = `
 You are "Annu", a friendly and professional virtual assistant embedded in
