@@ -165,9 +165,15 @@ const NAV_PATTERNS = [
 
 const NAV_VERB = /\b(go to|take me|show me|open|navigate|visit|redirect|see|yes|sure|ok|okay|yep|yup|please|do it)\b/i;
 
+/* Phrases that indicate the user wants information, NOT navigation */
+const INFO_PHRASES = /\b(tell me|what is|who is|show me|explain|describe|list|what are|how|about ananya|her skills|her projects|her experience)\b/i;
+
 function detectNav(msg) {
+  /* If it looks like an info request, never navigate */
+  if (INFO_PHRASES.test(msg)) return null;
+
   const hasVerb = NAV_VERB.test(msg);
-  const isShort = msg.trim().split(/\s+/).length <= 4;
+  const isShort = msg.trim().split(/\s+/).length <= 3;   // tightened: 3 words max for short-form nav
   if (!hasVerb && !isShort) return null;
   for (const { re, route } of NAV_PATTERNS) {
     if (re.test(msg)) return route;
