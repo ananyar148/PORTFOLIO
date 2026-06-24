@@ -7,6 +7,7 @@ export const experiences = [
   {
     id: 1,
     company: 'Lamda Infotech Pvt. Ltd.',
+    href: 'https://lamdainfotech.com/',
     role: 'Jr. Web Developer',
     duration: 'Dec 2025 – Feb 2026',
     location: 'Kolkata, West Bengal',
@@ -30,9 +31,9 @@ export const experiences = [
     id: 2,
     company: 'Freelance / Self-employed',
     role: 'Frontend Developer',
-    duration: 'Jun 2024 – Nov 2024',
+    duration: 'Jun 2024 – Aug 2024',
     location: 'Remote',
-    type: 'Freelance',
+    type: 'Part Time',
     description:
       'Developed a client data collection and notification system using Google Forms integrated with a database and automated email delivery to both parties on submission.',
     responsibilities: [

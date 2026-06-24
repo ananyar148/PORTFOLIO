@@ -165,49 +165,6 @@ export default function Hero() {
               className="hero-left"
             >
 
-              {/* ① Available badge */}
-              <motion.div variants={itemVariants} style={{ marginBottom: '1.75rem' }}>
-                <span
-                  style={{
-                    display:      'inline-flex',
-                    alignItems:   'center',
-                    gap:          '0.75rem',
-                    padding:      '0.625rem 1.375rem',
-                    fontSize:     '0.9375rem',
-                    fontWeight:   600,
-                    borderRadius: '9999px',
-                    border:       '2px solid var(--accent)',
-                    color:        'var(--accent)',
-                    background:   'rgba(59,130,246,0.08)',
-                    userSelect:   'none',
-                  }}
-                >
-                  <span style={{ position: 'relative', display: 'flex', width: '0.75rem', height: '0.75rem', flexShrink: 0 }}>
-                    <span
-                      className="animate-ping"
-                      style={{
-                        position:     'absolute',
-                        inset:        0,
-                        borderRadius: '50%',
-                        background:   '#4ade80',
-                        opacity:      0.75,
-                      }}
-                    />
-                    <span
-                      style={{
-                        position:     'relative',
-                        width:        '0.75rem',
-                        height:       '0.75rem',
-                        borderRadius: '50%',
-                        background:   '#4ade80',
-                        display:      'inline-flex',
-                      }}
-                    />
-                  </span>
-                  Available for opportunities
-                </span>
-              </motion.div>
-
               {/* ② Name */}
               <motion.h1
                 variants={itemVariants}
@@ -266,10 +223,9 @@ export default function Hero() {
                 }}
                 className="hero-ctas"
               >
-                {/* Download Resume */}
+                {/* Preview Resume */}
                 <motion.a
                   href="/images/ananya_raj_.pdf"
-                  download="Ananya_Raj_Resume.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.05, y: -3 }}
@@ -290,13 +246,14 @@ export default function Hero() {
                   }}
                 >
                   <svg viewBox="0 0 20 20" fill="currentColor" width="17" height="17" aria-hidden="true">
+                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
                     <path fillRule="evenodd"
-                      d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0
-                         011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414
-                         1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z"
+                      d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274
+                         4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0
+                         4 4 0 018 0z"
                       clipRule="evenodd" />
                   </svg>
-                  Download Resume
+                  Preview Resume
                 </motion.a>
 
                 {/* Get In Touch */}

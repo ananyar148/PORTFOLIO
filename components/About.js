@@ -22,54 +22,9 @@ const stagger = (delay = 0) => ({
   visible: { transition: { staggerChildren: 0.1, delayChildren: delay } },
 });
 
-/* ── Animated skill bar ─────────────────────────────────────────────── */
-/* inView is passed from the parent SkillCard so all bars fire together  */
-function SkillBar({ name, level, color, inView, index = 0 }) {
-  return (
-    <div style={{ marginBottom: '1.125rem' }}>
-      <div
-        style={{
-          display:        'flex',
-          justifyContent: 'space-between',
-          marginBottom:   '0.375rem',
-        }}
-      >
-        <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
-          {name}
-        </span>
-        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-          {level}%
-        </span>
-      </div>
-      <div
-        style={{
-          width:        '100%',
-          height:       '0.5rem',
-          borderRadius: '9999px',
-          overflow:     'hidden',
-          background:   'var(--border)',
-        }}
-        role="progressbar"
-        aria-valuenow={level}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-label={`${name} proficiency ${level}%`}
-      >
-        <motion.div
-          style={{ height: '100%', borderRadius: '9999px', background: color }}
-          initial={{ width: 0 }}
-          animate={{ width: inView ? `${level}%` : 0 }}
-          transition={{ duration: 1.1, ease: 'easeOut', delay: 0.15 + index * 0.08 }}
-        />
-      </div>
-    </div>
-  );
-}
-
 /* ── Skill category card ────────────────────────────────────────────── */
 function SkillCard({ category }) {
   const ref    = useRef(null);
-  /* amount:0.2 → fires when 20% of the card enters the viewport */
   const inView = useInView(ref, { once: true, amount: 0.2 });
 
   return (
@@ -100,16 +55,23 @@ function SkillCard({ category }) {
           {category.label}
         </h3>
       </div>
-      {category.skills.map((skill, i) => (
-        <SkillBar
-          key={skill.name}
-          name={skill.name}
-          level={skill.level}
-          color={category.color}
-          inView={inView}
-          index={i}
-        />
-      ))}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+        {category.skills.map((skill) => (
+          <span
+            key={skill.name}
+            className="text-sm font-medium"
+            style={{
+              padding:      '0.4rem 0.875rem',
+              borderRadius: '9999px',
+              border:       `1.5px solid ${category.color}`,
+              background:   `${category.color}12`,
+              color:        category.color,
+            }}
+          >
+            {skill.name}
+          </span>
+        ))}
+      </div>
     </motion.div>
   );
 }
@@ -157,10 +119,18 @@ export default function About() {
   const quickFacts = [
     { icon: '🎓', label: 'Education', value: PROFILE.education },
     { icon: '📍', label: 'Location',  value: PROFILE.location  },
-    { icon: '💻', label: 'GitHub',    value: PROFILE.github     },
+    {
+      icon: '💻', label: 'GitHub',
+      value: 'AnanyaRaj14',
+      href: PROFILE.github,
+    },
     { icon: '🌍', label: 'Languages', value: 'English, Hindi, Maithili' },
     { icon: '🎯', label: 'Goal',      value: 'Build impactful, accessible products' },
-    { icon: '📧', label: 'Email',     value: PROFILE.email      },
+    {
+      icon: '📧', label: 'Email',
+      value: PROFILE.email,
+      href: `mailto:${PROFILE.email}`,
+    },
   ];
 
   const interests = [
@@ -249,7 +219,7 @@ export default function About() {
               style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.875rem' }}
               aria-label="Personal details"
             >
-              {quickFacts.map(({ icon, label, value }) => (
+              {quickFacts.map(({ icon, label, value, href }) => (
                 <li
                   key={label}
                   className="text-sm"
@@ -267,7 +237,25 @@ export default function About() {
                   >
                     {label}:
                   </span>
-                  <span style={{ color: 'var(--text-secondary)' }}>{value}</span>
+                  {href ? (
+                    <a
+                      href={href}
+                      target={href.startsWith('mailto') ? undefined : '_blank'}
+                      rel={href.startsWith('mailto') ? undefined : 'noopener noreferrer'}
+                      style={{
+                        color:          'var(--accent)',
+                        textDecoration: 'none',
+                        borderBottom:   '1px solid transparent',
+                        transition:     'border-color 0.2s',
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.borderBottomColor = 'var(--accent)'}
+                      onMouseLeave={(e) => e.currentTarget.style.borderBottomColor = 'transparent'}
+                    >
+                      {value}
+                    </a>
+                  ) : (
+                    <span style={{ color: 'var(--text-secondary)' }}>{value}</span>
+                  )}
                 </li>
               ))}
             </ul>

@@ -13,10 +13,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ThemeToggle from './ThemeToggle';
 
 const NAV_LINKS = [
-  { label: 'Home',     href: '/'         },
-  { label: 'About',    href: '/about'    },
-  { label: 'Projects', href: '/projects' },
-  { label: 'Contact',  href: '/contact'  },
+  { label: 'Home',       href: '/'           },
+  { label: 'About',      href: '/about'      },
+  { label: 'Projects',   href: '/projects'   },
+  { label: 'Experience', href: '/experience' },
+  { label: 'Contact',    href: '/contact'    },
 ];
 
 export default function Navbar() {
