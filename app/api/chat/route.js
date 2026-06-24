@@ -136,13 +136,13 @@ and keep your reply to one sentence.
 
 /* ── Navigation intent detection ────────────────────────────────── */
 const NAV_PATTERNS = [
-  { re: /\b(home|start|landing|main page|go back)\b/i,               route: '/'         },
-  { re: /\b(about|who is|her background|about page)\b/i,             route: '/about'    },
-  { re: /\b(project|work|portfolio|built|show me|what.*built)\b/i,   route: '/projects' },
-  { re: /\b(contact|reach|hire|get in touch|email her)\b/i,          route: '/contact'  },
+  { re: /\b(home|start|landing|main page|go back)\b/i,                    route: '/'         },
+  { re: /\b(about page|about section|her background|who she is)\b/i,      route: '/about'    },
+  { re: /\b(projects page|project section|her work|her portfolio)\b/i,    route: '/projects' },
+  { re: /\b(contact page|contact section|get in touch|email her)\b/i,     route: '/contact'  },
 ];
 
-const NAV_VERB = /\b(go to|take me|show me|open|navigate|visit|redirect|see|yes|sure|ok|okay|yep|yup|please|do it)\b/i;
+const NAV_VERB = /\b(go to|take me to|open the|navigate to|visit the|redirect me|bring me to)\b/i;
 
 /* Phrases that indicate the user wants information, NOT navigation */
 const INFO_PHRASES = /\b(tell me|what is|who is|show me|explain|describe|list|what are|how|about ananya|her skills|her projects|her experience)\b/i;
@@ -161,11 +161,20 @@ function detectNav(msg) {
 }
 
 function detectNavFromReply(reply) {
+  /*
+   * Only trigger navigation if Gemini EXPLICITLY says it is redirecting.
+   * Require both a strong redirect verb AND a page reference.
+   * This prevents info answers about "about", "projects" etc. from
+   * accidentally triggering navigation.
+   */
   const r = reply.toLowerCase();
-  if (/project|portfolio|built|work/i.test(r) && /redirect|taking|navigat|going|heading/i.test(r)) return '/projects';
-  if (/about|bio|skill|background/i.test(r)   && /redirect|taking|navigat|going|heading/i.test(r)) return '/about';
-  if (/contact|reach|hire|touch/i.test(r)     && /redirect|taking|navigat|going|heading/i.test(r)) return '/contact';
-  if (/home|landing|main/i.test(r)            && /redirect|taking|navigat|going|heading/i.test(r)) return '/';
+  const isRedirecting = /\b(redirect(ing)?|taking you|navigating you|heading (to|over)|let me take|i('ll| will) (take|bring|send)|going to the)\b/i.test(reply);
+  if (!isRedirecting) return null;
+
+  if (/\b(project|portfolio)\b/i.test(r)) return '/projects';
+  if (/\b(about page|about section)\b/i.test(r)) return '/about';
+  if (/\b(contact page|contact section)\b/i.test(r)) return '/contact';
+  if (/\b(home page|main page|landing page)\b/i.test(r)) return '/';
   return null;
 }
 
