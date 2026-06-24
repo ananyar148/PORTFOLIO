@@ -61,21 +61,22 @@ async function buildGenAI() {
   const jwt = getJWT();
   if (jwt) {
     try {
-      const { token } = await jwt.getAccessToken();
-      if (token) {
-        /*
-         * Pass the short-lived OAuth2 bearer token as the apiKey.
-         * Pin the endpoint to the Developer API which accepts bearer tokens.
-         */
-        return new GoogleGenAI({
-          apiKey: token,
-          httpOptions: {
-            baseUrl: 'https://generativelanguage.googleapis.com',
-          },
-        });
-      }
+      /*
+       * Use Vertex AI mode — this sends credentials as
+       * "Authorization: Bearer <token>" which the Vertex AI
+       * endpoint accepts. The authClient handles token refresh automatically.
+       */
+      const PROJECT_ID = SA.project_id ?? process.env.GOOGLE_CLOUD_PROJECT;
+      return new GoogleGenAI({
+        vertexai:  true,
+        project:   PROJECT_ID,
+        location:  'us-central1',
+        googleAuthOptions: {
+          authClient: jwt,
+        },
+      });
     } catch (e) {
-      console.warn('[chat/route] SA token error:', e.message);
+      console.warn('[chat/route] Vertex AI setup error:', e.message);
     }
   }
 
@@ -86,7 +87,7 @@ async function buildGenAI() {
 }
 
 /* ── Model ──────────────────────────────────────────────────────── */
-const MODEL = 'gemini-2.0-flash';
+const MODEL = 'gemini-2.5-flash';
 
 /* ── System prompt — built from chatData.js (single source of truth) ── */
 const SYSTEM_INSTRUCTION = `
