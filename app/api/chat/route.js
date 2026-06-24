@@ -74,54 +74,7 @@ async function buildGenAI() {
 }
 
 /* ── 4. Model and System Prompt ─────────────────────────────────── */
-// const MODEL = 'gemini-2.0-flash';
-
-// const SYSTEM_INSTRUCTION = `
-// You are "Annu", a friendly and professional virtual assistant embedded in
-// Ananya Raj's developer portfolio website. Help visitors learn about Ananya
-// and navigate the site.
-
-// PERSONALITY:
-// - Warm, concise, conversational — never robotic
-// - Use emojis sparingly for friendliness
-// - Keep answers under 150 words unless the visitor asks for detail
-// - Only answer questions related to Ananya's portfolio and work
-// - For off-topic questions politely say you only know about Ananya's work
-
-// ABOUT ANANYA RAJ:
-// - Name: ${PROFILE.name}
-// - Title: ${PROFILE.title}
-// - Email: ${PROFILE.email}
-// - GitHub: ${PROFILE.github}
-// - LinkedIn: ${PROFILE.linkedin}
-// - Location: ${PROFILE.location}
-// - Education: ${PROFILE.education}
-// - Bio: ${PROFILE.bio}
-
-// SKILLS:
-// - Frontend: ${SKILLS.frontend.join(', ')}
-// - Backend: ${SKILLS.backend.join(', ')}
-// - Databases: ${SKILLS.databases.join(', ')}
-// - Tools: ${SKILLS.tools.join(', ')}
-
-// PROJECTS:
-// ${PROJECTS.map((p, i) => `${i + 1}. ${p.name} — ${p.desc}\n   Stack: ${p.stack.join(', ')}\n   GitHub: ${p.github}`).join('\n')}
-
-// EXPERIENCE:
-// ${EXPERIENCE.map((e, i) => `${i + 1}. ${e.role} @ ${e.company} (${e.duration})\n   ${e.summary}`).join('\n\n')}
-
-// SITE PAGES:
-// - Home: /
-// - About (bio + skills): /about
-// - Projects + Experience: /projects
-// - Contact form: /contact
-
-// When the visitor asks to navigate somewhere, confirm you are redirecting them
-// and keep your reply to one sentence.
-// `.trim();
-
-/* ── 4. Model and System Prompt ─────────────────────────────────── */
-const MODEL = 'gemini-3.5-flash';
+const MODEL = 'gemini-2.0-flash'; // Fixed the model name here!
 
 const SYSTEM_INSTRUCTION = `
 You are "Annu", a friendly and professional virtual assistant embedded in
@@ -130,7 +83,7 @@ and navigate the site.
 
 CRITICAL RULES:
 1. UNDER NO CIRCUMSTANCES should you invent, hallucinate, or make up any details about Ananya's experience, projects, or education.
-2. ONLY use the exact information provided below. Do not mention generic companies like "TechCorp".
+2. ONLY use the exact information provided below.
 3. If a user asks something not covered in the data below, politely say you only know about the specific projects and experience listed on her portfolio.
 4. Keep answers conversational but strictly factual. Keep it under 150 words.
 
@@ -166,22 +119,22 @@ When the visitor asks to navigate somewhere, confirm you are redirecting them
 and keep your reply to one sentence.
 `.trim();
 
-/* ── 5. Navigation Intent Detection ─────────────────────────────── */
+/* ── 5. Navigation Intent Detection (Upgraded) ──────────────────── */
 const NAV_PATTERNS = [
-  { re: /\b(home|start|landing|main page|go back)\b/i,                    route: '/'         },
-  { re: /\b(about page|about section|her background|who she is)\b/i,      route: '/about'    },
-  { re: /\b(projects page|project section|her work|her portfolio)\b/i,    route: '/projects' },
-  { re: /\b(contact page|contact section|get in touch|email her)\b/i,     route: '/contact'  },
+  { re: /\b(home|start|landing|main page|go back)\b/i,               route: '/'         },
+  { re: /\b(about|who is|her background|about page)\b/i,             route: '/about'    },
+  { re: /\b(project|work|portfolio|built|show me|what.*built)\b/i,   route: '/projects' },
+  { re: /\b(contact|reach|hire|get in touch|email her)\b/i,          route: '/contact'  },
 ];
 
-const NAV_VERB = /\b(go to|take me to|open the|navigate to|visit the|redirect me|bring me to)\b/i;
-const INFO_PHRASES = /\b(tell me|what is|who is|show me|explain|describe|list|what are|how|about ananya|her skills|her projects|her experience)\b/i;
+const NAV_VERB = /\b(go to|take me|show me|open|navigate|visit|redirect|see|yes|sure|ok|okay|yep|yup|please|do it)\b/i;
+const INFO_PHRASES = /\b(tell me|what is|who is|explain|describe|list|what are|how|about ananya|her skills|her projects|her experience)\b/i;
 
 function detectNav(msg) {
   if (INFO_PHRASES.test(msg)) return null;
 
   const hasVerb = NAV_VERB.test(msg);
-  const isShort = msg.trim().split(/\s+/).length <= 3;
+  const isShort = msg.trim().split(/\s+/).length <= 4;
   if (!hasVerb && !isShort) return null;
   for (const { re, route } of NAV_PATTERNS) {
     if (re.test(msg)) return route;
@@ -226,7 +179,7 @@ export async function POST(request) {
       config: {
         systemInstruction: SYSTEM_INSTRUCTION,
         maxOutputTokens:   512,
-        temperature:       0.2, // <-- CHANGED THIS FROM 0.7 TO 0.2
+        temperature:       0.2,
       },
       history: geminiHistory,
     });
