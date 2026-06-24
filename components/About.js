@@ -9,6 +9,7 @@
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { skillCategories, stats } from '@/data/skills';
+import { PROFILE } from '@/lib/chatData';
 
 /* ── Animation variants ─────────────────────────────────────────────── */
 const fadeUp = {
@@ -154,22 +155,24 @@ export default function About() {
   const headerView = useInView(headerRef, { once: true, margin: '-80px' });
 
   const quickFacts = [
-    { icon: '🎓', label: 'Education', value: 'B.Tech. Computer Science, 2026' },
-    { icon: '📍', label: 'Location',  value: 'Kolkata, West Bengal'           },
-    { icon: '💻', label: 'GitHub',    value: 'github.com/ananyar148'          },
-    { icon: '🌍', label: 'Languages', value: 'English, Hindi, Maithli'        },
+    { icon: '🎓', label: 'Education', value: PROFILE.education },
+    { icon: '📍', label: 'Location',  value: PROFILE.location  },
+    { icon: '💻', label: 'GitHub',    value: PROFILE.github     },
+    { icon: '🌍', label: 'Languages', value: 'English, Hindi, Maithili' },
     { icon: '🎯', label: 'Goal',      value: 'Build impactful, accessible products' },
+    { icon: '📧', label: 'Email',     value: PROFILE.email      },
   ];
 
   const interests = [
-    'Web Development', 'UI/UX Design', 'Reading Books', 'Solo Travelling',
-    'System Design', 'Data Structure', 'Photography',
+    'Web Development', 'UI/UX Design', 'Open Source',
+    'System Design', 'Tech Blogging',
   ];
 
   const goals = [
-    'Contribute to major full stack projects',
-    'Build a SaaS product from scratch',
+    'Master advanced JavaScript patterns',
+    'Contribute to major open-source projects',
     'Deepen knowledge of cloud architecture (AWS/GCP)',
+    'Build and ship full-stack products end-to-end',
   ];
 
   return (
@@ -231,17 +234,14 @@ export default function About() {
               className="leading-relaxed"
               style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}
             >
-              I&rsquo;m a passionate full stack developer building modern web applications. I love
-              turning complex problems into clean, user friendly solutions using the latest
-              technologies.
+              {PROFILE.bio}
             </p>
             <p
               className="leading-relaxed"
               style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}
             >
               When I&rsquo;m not coding, you&rsquo;ll find me exploring new frameworks, contributing
-              to open source projects, or enjoying a good cup of coffee while reading about
-              software architecture.
+              to open-source projects, or diving deep into software architecture and system design.
             </p>
 
             {/* Quick facts */}

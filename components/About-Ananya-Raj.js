@@ -3,37 +3,36 @@
 /**
  * About.js
  * Combined About + Skills section.
- * Includes personal info, career summary, education, stats,
- * and skill categories with animated progress bars.
+ * Data sourced from @/lib/chatData — single source of truth.
  */
 
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { skillCategories, stats } from '@/data/skills';
+import { PROFILE } from '@/lib/chatData';
 
 const INTERESTS = [
   'Web Development',
   'UI/UX Design',
   'Open Source',
-  // 'Machine Learning',
   'System Design',
   'Tech Blogging',
-  'Photography',
 ];
 
 const PERSONAL_DETAILS = [
-  { icon: '🎓', label: 'Education', value: 'B.Tech in Computer Science, 2026' },
-  { icon: '📍', label: 'Location', value: 'Kolkata, West Bengal' },
-  { icon: '💻', label: 'GitHub', value: 'github.com/ananyar148' },
+  { icon: '🎓', label: 'Education', value: PROFILE.education },
+  { icon: '📍', label: 'Location',  value: PROFILE.location  },
+  { icon: '💻', label: 'GitHub',    value: PROFILE.github    },
   { icon: '🌍', label: 'Languages', value: 'English, Hindi, Maithili' },
-  { icon: '🎯', label: 'Goal', value: 'Build impactful, accessible products' },
+  { icon: '🎯', label: 'Goal',      value: 'Build impactful, accessible products' },
+  { icon: '📧', label: 'Email',     value: PROFILE.email     },
 ];
 
 const CURRENT_GOALS = [
   'Master advanced JavaScript patterns',
   'Contribute to major open-source projects',
-  'Build a SaaS product from scratch',
   'Deepen knowledge of cloud architecture (AWS/GCP)',
+  'Build and ship full-stack products end-to-end',
 ];
 
 const CARD_CLASS =
@@ -207,14 +206,12 @@ export default function About() {
             </h3>
             <div className="mx-auto space-y-5 text-pretty">
               <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
-                I&rsquo;m a passionate full stack developer with 3+ years of hands-on experience
-                building modern web applications. I love turning complex problems into clean,
-                user-friendly solutions using the latest technologies.
+                {PROFILE.bio}
               </p>
               <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 When I&rsquo;m not coding, you&rsquo;ll find me exploring new frameworks,
-                contributing to open-source projects, or enjoying a good cup of coffee
-                while reading about software architecture.
+                contributing to open-source projects, or diving deep into software architecture
+                and system design.
               </p>
             </div>
           </motion.div>
