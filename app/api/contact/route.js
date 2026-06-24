@@ -107,7 +107,9 @@ export async function POST(request) {
       schemaReady = true;
     }
   } catch (err) {
+    // Log the full error server-side for debugging; never send details to client
     console.error('[contact/route] DB schema init failed:', err.message);
+    console.error('[contact/route] Hint: check DATABASE_URL is set correctly in Vercel env vars.');
     return NextResponse.json(
       { success: false, message: 'Database unavailable. Please try again later.' },
       { status: 503 }
