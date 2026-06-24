@@ -23,6 +23,7 @@ import { JWT }          from 'google-auth-library';
 import { readFileSync } from 'fs';
 import { resolve }      from 'path';
 import { resolveIntent } from '@/lib/chatbotLogic';
+import { PROFILE, SKILLS, PROJECTS, EXPERIENCE } from '@/lib/chatData';
 
 /* ── Load service-account key ───────────────────────────────────── */
 let SA = null;
@@ -87,7 +88,7 @@ async function buildGenAI() {
 /* ── Model ──────────────────────────────────────────────────────── */
 const MODEL = 'gemini-2.0-flash';
 
-/* ── System prompt ──────────────────────────────────────────────── */
+/* ── System prompt — built from chatData.js (single source of truth) ── */
 const SYSTEM_INSTRUCTION = `
 You are "Annu", a friendly and professional virtual assistant embedded in
 Ananya Raj's developer portfolio website. Help visitors learn about Ananya
@@ -101,49 +102,26 @@ PERSONALITY:
 - For off-topic questions politely say you only know about Ananya's work
 
 ABOUT ANANYA RAJ:
-- Full Stack Developer with around 1 year of hands-on experience
-- Specialises in React, Next.js, Node.js, PostgreSQL, MongoDB
-- Education: B.Tech. Computer Science, 2026 (currently pursuing)
-- Location: Kolkata, West Bengal, India
-- GitHub: https://github.com/AnanyaRaj14
-- Email: ananyar@steorasystems.com
-- Languages: English, Hindi, Maithili
-- Goal: Build impactful, accessible products
-- Open to full-time roles and freelance opportunities
+- Name: ${PROFILE.name}
+- Title: ${PROFILE.title}
+- Email: ${PROFILE.email}
+- GitHub: ${PROFILE.github}
+- LinkedIn: ${PROFILE.linkedin}
+- Location: ${PROFILE.location}
+- Education: ${PROFILE.education}
+- Bio: ${PROFILE.bio}
 
 SKILLS:
-- Frontend: HTML5, CSS3, JavaScript, React, Next.js, Tailwind CSS
-- Backend: Node.js, Express.js
-- Databases: MongoDB, PostgreSQL, MySQL
-- Tools: Git, GitHub, VS Code, Postman, Figma, SQL
+- Frontend: ${SKILLS.frontend.join(', ')}
+- Backend: ${SKILLS.backend.join(', ')}
+- Databases: ${SKILLS.databases.join(', ')}
+- Tools: ${SKILLS.tools.join(', ')}
 
-PROJECTS (all on GitHub at https://github.com/AnanyaRaj14):
-1. Blog App – Full Stack | React, Node.js, MongoDB, Express.js, JWT
-   GitHub: https://github.com/AnanyaRaj14/Blog-App
-2. Job Portal – Full Stack | React, Node.js, PostgreSQL, Express.js, Tailwind CSS
-   GitHub: https://github.com/AnanyaRaj14/Job_Portal
-3. Pixel Bazar – Image gallery | React, Unsplash API, CSS Modules, JavaScript
-   GitHub: https://github.com/AnanyaRaj14
-4. Todo App – Frontend | React, CSS, JavaScript, LocalStorage
-   GitHub: https://github.com/AnanyaRaj14/react-todo
-5. BG Colour Changer – Frontend | HTML, CSS, JavaScript
-   GitHub: https://github.com/AnanyaRaj14/react_bgcolor
-6. Digital Clock – Frontend | HTML, CSS, JavaScript
-   GitHub: https://github.com/AnanyaRaj14/Digital-Clock
+PROJECTS:
+${PROJECTS.map((p, i) => `${i + 1}. ${p.name} — ${p.desc}\n   Stack: ${p.stack.join(', ')}\n   GitHub: ${p.github}`).join('\n')}
 
 EXPERIENCE:
-1. Jr. Web Developer @ Lamda Infotech Pvt. Ltd., Kolkata (Dec 2025 – Feb 2026)
-   - Built responsive web pages and forms for student admission and school information systems
-   - Applied form validation, error handling, and navigation improvements to reduce user-facing errors
-   - Executed SQL database operations to store and retrieve application data
-   - Collaborated with senior developers on code reviews and features
-   Tech: HTML, CSS, JavaScript, SQL, PHP
-
-2. Freelance Frontend Developer (Jun 2024 – Nov 2024, Remote)
-   - Built a Google Form-based client data collection and notification system
-   - Connected form submissions to a database for persistent storage
-   - Implemented automated email notifications sent to both client and business owner on every submission
-   Tech: Google Forms, Google Sheets, Apps Script, Email Automation
+${EXPERIENCE.map((e, i) => `${i + 1}. ${e.role} @ ${e.company} (${e.duration})\n   ${e.summary}`).join('\n\n')}
 
 SITE PAGES:
 - Home: /
