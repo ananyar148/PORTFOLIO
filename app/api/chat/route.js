@@ -3,9 +3,15 @@
  *
  * POST /api/chat
  *
- * Calls Gemini via the @google/genai SDK in Vertex AI mode (global region).
- * Service-account credentials are read from training.json — bearer-token auth
- * is handled entirely server-side; nothing sensitive reaches the browser.
+ * Calls Google Gemini via the @google/genai SDK using a service-account
+ * bearer token (Vertex AI credentials, Developer API endpoint).
+ *
+ * Credential loading priority:
+ *   1. GOOGLE_SERVICE_ACCOUNT_JSON env var  — base64-encoded JSON
+ *      (used in production / Vercel where the file cannot be deployed)
+ *   2. training.json on disk                — local development only
+ *
+ * The credentials NEVER reach the browser — server-only.
  *
  * Request body : { message: string, history: Array<{role,text}> }
  * Response     : { reply: string, navigate: string|null }
@@ -16,18 +22,24 @@ import { GoogleGenAI }  from '@google/genai';
 import { JWT }          from 'google-auth-library';
 import { readFileSync } from 'fs';
 import { resolve }      from 'path';
+import { resolveIntent } from '@/lib/chatbotLogic';
 
 /* ── Load service-account key ───────────────────────────────────── */
 let SA = null;
-try {
-  SA = JSON.parse(readFileSync(resolve(process.cwd(), 'training.json'), 'utf-8'));
-  console.log('[chat/route] ✓ training.json loaded, project:', SA.project_id);
-} catch (err) {
-  console.warn('[chat/route] training.json not found:', err.message);
-}
+const _b64EnvVar = process.env.GOOGLE_SERVICE_ACCOUNT_JSON;
+console.log('[chat/route] GOOGLE_SERVICE_ACCOUNT_JSON present:', !!_b64EnvVar, '| length:', _b64EnvVar?.length ?? 0);
 
-const PROJECT_ID = SA?.project_id ?? process.env.GOOGLE_CLOUD_PROJECT;
-const LOCATION   = 'global';           // always global region per requirement
+try {
+  if (_b64EnvVar) {
+    SA = JSON.parse(Buffer.from(_b64EnvVar.trim(), 'base64').toString('utf-8'));
+    console.log('[chat/route] ✓ SA loaded from env var, project:', SA.project_id);
+  } else {
+    SA = JSON.parse(readFileSync(resolve(process.cwd(), 'training.json'), 'utf-8'));
+    console.log('[chat/route] ✓ training.json loaded, project:', SA.project_id);
+  }
+} catch (err) {
+  console.error('[chat/route] SA load failed:', err.message);
+}
 
 /* ── Lazy JWT client ────────────────────────────────────────────── */
 let _jwt = null;
@@ -43,47 +55,37 @@ function getJWT() {
   return _jwt;
 }
 
-/* ── Build a GoogleGenAI instance ───────────────────────────────── */
+/* ── Build an authenticated GoogleGenAI instance ───────────────── */
 async function buildGenAI() {
-  /* Option A — service account: get a bearer token and inject it */
   const jwt = getJWT();
-  if (jwt && PROJECT_ID) {
+  if (jwt) {
     try {
       const { token } = await jwt.getAccessToken();
       if (token) {
         /*
-         * Vertex AI mode sends the token correctly as:
-         *   Authorization: Bearer <token>
-         * rather than x-goog-api-key, which is what caused the 400.
+         * Pass the short-lived OAuth2 bearer token as the apiKey.
+         * Pin the endpoint to the Developer API which accepts bearer tokens.
          */
         return new GoogleGenAI({
-          vertexai:  true,
-          project:   PROJECT_ID,
-          location:  LOCATION,
-          googleAuthOptions: {
-            authClient: jwt,
+          apiKey: token,
+          httpOptions: {
+            baseUrl: 'https://generativelanguage.googleapis.com',
           },
         });
       }
     } catch (e) {
-      console.warn('[chat/route] SA token error – falling back to API key:', e.message);
+      console.warn('[chat/route] SA token error:', e.message);
     }
   }
 
-  /* Option B — plain Gemini API key (fallback) */
-  const key = process.env.GEMINI_API_KEY;
-  if (!key || key === 'your_gemini_api_key_here') {
-    throw new Error(
-      'No Gemini credentials available. ' +
-      'Ensure training.json is present and valid, or set GEMINI_API_KEY in .env.local.'
-    );
-  }
-  console.log('[chat/route] Using GEMINI_API_KEY (Developer API)');
-  return new GoogleGenAI({ apiKey: key });
+  throw new Error(
+    'No Gemini credentials available. ' +
+    'Set GOOGLE_SERVICE_ACCOUNT_JSON in your deployment environment variables.'
+  );
 }
 
 /* ── Model ──────────────────────────────────────────────────────── */
-const MODEL = 'gemini-2.5-flash';
+const MODEL = 'gemini-2.0-flash';
 
 /* ── System prompt ──────────────────────────────────────────────── */
 const SYSTEM_INSTRUCTION = `
@@ -103,9 +105,9 @@ ABOUT ANANYA RAJ:
 - Specialises in React, Next.js, Node.js, PostgreSQL, MongoDB
 - Education: B.Tech. Computer Science, 2026 (currently pursuing)
 - Location: Kolkata, West Bengal, India
-- GitHub: https://github.com/ananyar148
+- GitHub: https://github.com/AnanyaRaj14
 - Email: ananyar@steorasystems.com
-- Languages: English, Hindi, Maithli
+- Languages: English, Hindi, Maithili
 - Goal: Build impactful, accessible products
 - Open to full-time roles and freelance opportunities
 
@@ -161,29 +163,24 @@ const NAV_PATTERNS = [
   { re: /\b(contact|reach|hire|get in touch|email her)\b/i,          route: '/contact'  },
 ];
 
-/* Verbs that signal navigation intent */
 const NAV_VERB = /\b(go to|take me|show me|open|navigate|visit|redirect|see|yes|sure|ok|okay|yep|yup|please|do it)\b/i;
 
 function detectNav(msg) {
-  /* Check if message contains a nav verb OR is a short confirmation */
-  const hasVerb     = NAV_VERB.test(msg);
-  const isShort     = msg.trim().split(/\s+/).length <= 4;
+  const hasVerb = NAV_VERB.test(msg);
+  const isShort = msg.trim().split(/\s+/).length <= 4;
   if (!hasVerb && !isShort) return null;
-
   for (const { re, route } of NAV_PATTERNS) {
     if (re.test(msg)) return route;
   }
   return null;
 }
 
-/* ── Fallback: extract route from Gemini's reply text ───────────── */
-/* If detectNav returned null but Gemini says "redirecting to X", trust it */
 function detectNavFromReply(reply) {
   const r = reply.toLowerCase();
   if (/project|portfolio|built|work/i.test(r) && /redirect|taking|navigat|going|heading/i.test(r)) return '/projects';
-  if (/about|bio|skill|background/i.test(r)    && /redirect|taking|navigat|going|heading/i.test(r)) return '/about';
-  if (/contact|reach|hire|touch/i.test(r)      && /redirect|taking|navigat|going|heading/i.test(r)) return '/contact';
-  if (/home|landing|main/i.test(r)             && /redirect|taking|navigat|going|heading/i.test(r)) return '/';
+  if (/about|bio|skill|background/i.test(r)   && /redirect|taking|navigat|going|heading/i.test(r)) return '/about';
+  if (/contact|reach|hire|touch/i.test(r)     && /redirect|taking|navigat|going|heading/i.test(r)) return '/contact';
+  if (/home|landing|main/i.test(r)            && /redirect|taking|navigat|going|heading/i.test(r)) return '/';
   return null;
 }
 
@@ -207,12 +204,10 @@ export async function POST(request) {
   try {
     const ai = await buildGenAI();
 
-    /* Build history: user/model turns only */
     const geminiHistory = history
       .filter((m) => m.role === 'user' || m.role === 'model')
       .map((m) => ({ role: m.role, parts: [{ text: m.text }] }));
 
-    /* Multi-turn chat session */
     const chat = ai.chats.create({
       model:  MODEL,
       config: {
@@ -227,13 +222,23 @@ export async function POST(request) {
     const reply    = response.text?.trim()
       ?? "I'm sorry, I couldn't generate a response right now.";
 
-    /* Use detectNav result, or fall back to scanning Gemini's reply */
     const finalNavigate = navigate ?? detectNavFromReply(reply);
 
     return NextResponse.json({ reply, navigate: finalNavigate }, { status: 200 });
 
   } catch (err) {
     console.error('[chat/route] Gemini error:', err?.message ?? err);
+
+    /* ── Fallback: local rule-based engine ── */
+    try {
+      const fallback = resolveIntent(message);
+      return NextResponse.json(
+        { reply: fallback.text, navigate: navigate ?? fallback.navigate ?? null },
+        { status: 200 }
+      );
+    } catch (fallbackErr) {
+      console.error('[chat/route] fallback error:', fallbackErr?.message);
+    }
 
     return NextResponse.json(
       {
